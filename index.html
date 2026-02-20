@@ -59,7 +59,7 @@
   .container {
     display: flex;
     gap: 0;
-    height: calc(100vh - 48px);
+    height: calc(100vh - 84px);
   }
   .panel {
     overflow-y: auto;
@@ -313,6 +313,37 @@
     .panel-left { border-bottom: 2px solid var(--border); }
   }
 
+  /* TAB BAR */
+  .tab-bar {
+    display: flex;
+    background: #152238;
+    padding: 0 24px;
+    gap: 0;
+    position: sticky;
+    top: 48px;
+    z-index: 99;
+  }
+  .tab-btn {
+    background: transparent;
+    color: rgba(255,255,255,0.55);
+    border: none;
+    padding: 9px 22px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -2px;
+    transition: color 0.2s, border-color 0.2s;
+  }
+  .tab-btn:hover { color: rgba(255,255,255,0.85); }
+  .tab-btn.active { color: #fff; border-bottom-color: #4a90d9; }
+
+  /* TABLE STYLES */
+  table.vals { border-collapse: collapse; width: 100%; }
+  table.vals th, table.vals td { padding: 3px 8px; text-align: left; border-bottom: 1px solid #eee; font-size: 11px; }
+  table.vals th { font-weight: 700; color: var(--navy); border-bottom: 2px solid var(--border); }
+  table.vals tr.severe td { color: var(--red); font-weight: 700; }
+
   /* DARK MODE */
   body.dark {
     --light-bg: #1a1d23;
@@ -357,6 +388,11 @@
   body.dark .val-normal { color: #66bb6a; }
   body.dark .val-abnormal { color: #ef5350; }
   body.dark .val-borderline { color: #ffa726; }
+  body.dark .tab-bar { background: #0d1117; }
+  body.dark .tab-btn.active { border-bottom-color: #4a90d9; }
+  body.dark table.vals th { color: #8ab4f8; border-bottom-color: #3a3f4b; }
+  body.dark table.vals td { border-bottom-color: #2e323c; }
+  body.dark table.vals tr.severe td { color: #ef5350; }
 </style>
 </head>
 <body>
@@ -368,6 +404,11 @@
     <button onclick="clearAll()">Clear All</button>
     <button id="darkToggle" onclick="toggleDark()">Dark Mode</button>
   </div>
+</div>
+
+<div class="tab-bar">
+  <button class="tab-btn active" id="tabRhc" onclick="switchTab('rhc')">RHC Hemodynamics</button>
+  <button class="tab-btn" id="tabShunt" onclick="switchTab('shunt')">Shunts</button>
 </div>
 
 <div class="container">
@@ -614,7 +655,7 @@
   </div>
 
   <!-- CO SOURCE FOR DERIVED -->
-  <div class="section">
+  <div class="section" id="coSourceSection">
     <div class="section-head">CO Source for Derived Hemodynamics</div>
     <div class="section-body">
       <div class="radio-row">
@@ -627,7 +668,7 @@
   </div>
 
   <!-- GORLIN VALVE AREA INPUTS -->
-  <div class="section">
+  <div class="section" id="gorlinInputSection">
     <div class="section-head">Gorlin Valve Area Calculations (Optional)</div>
     <div class="section-body">
 
@@ -668,10 +709,99 @@
     </div>
   </div>
 
+  <!-- SHUNT OXIMETRY RUN (Shunts tab only) -->
+  <div class="section" id="shuntInputSection" style="display:none;">
+    <div class="section-head">Shunt Oximetry Run</div>
+    <div class="section-body">
+      <div class="input-row">
+        <label>PV O₂</label>
+        <select id="pvo2_source" onchange="handlePvO2Source(); calc();">
+          <option value="assume_sa">Assume = SaO₂ (no R→L shunt)</option>
+          <option value="assume_98">Assume 98% (room air)</option>
+          <option value="manual">Enter manually (wedge PA sample)</option>
+        </select>
+      </div>
+      <div class="input-row" id="pvO2ManualRow" style="display:none;">
+        <label>PV O₂</label>
+        <input type="number" id="pv_o2_manual" step="0.1" placeholder="%" oninput="calc()">
+        <span class="unit">%</span>
+      </div>
+      <div class="input-row">
+        <label>FiO₂</label>
+        <input type="number" id="fio2" step="1" placeholder="21" value="21" oninput="calc()">
+        <span class="unit">%</span>
+        <span class="hint" style="margin-left:8px;">Room air = 21%. If &gt; 30%, must use full O₂ content equation.</span>
+      </div>
+
+      <div class="subsection">SVC</div>
+      <div class="input-row">
+        <label>High SVC</label>
+        <input type="number" id="svc_high" step="0.1" placeholder="%" oninput="calc()">
+        <span class="unit">%</span>
+        &nbsp;&nbsp;
+        <label>Low SVC</label>
+        <input type="number" id="svc_low" step="0.1" placeholder="%" oninput="calc()">
+        <span class="unit">%</span>
+      </div>
+
+      <div class="subsection">IVC</div>
+      <div class="input-row">
+        <label>IVC</label>
+        <input type="number" id="ivc_sat" step="0.1" placeholder="%" oninput="calc()">
+        <span class="unit">%</span>
+      </div>
+
+      <div class="subsection">Right Atrium</div>
+      <div class="input-row">
+        <label>RA high</label>
+        <input type="number" id="ra_high_sat" step="0.1" placeholder="%" oninput="calc()">
+        <span class="unit">%</span>
+        &nbsp;&nbsp;
+        <label>RA mid</label>
+        <input type="number" id="ra_mid_sat" step="0.1" placeholder="%" oninput="calc()">
+        <span class="unit">%</span>
+        &nbsp;&nbsp;
+        <label>RA low</label>
+        <input type="number" id="ra_low_sat" step="0.1" placeholder="%" oninput="calc()">
+        <span class="unit">%</span>
+      </div>
+
+      <div class="subsection">Right Ventricle</div>
+      <div class="input-row">
+        <label>RV mid</label>
+        <input type="number" id="rv_mid_sat" step="0.1" placeholder="%" oninput="calc()">
+        <span class="unit">%</span>
+        &nbsp;&nbsp;
+        <label>RVOT</label>
+        <input type="number" id="rvot_sat" step="0.1" placeholder="%" oninput="calc()">
+        <span class="unit">%</span>
+      </div>
+
+      <div class="subsection">Pulmonary Artery</div>
+      <div class="input-row">
+        <label>PA main</label>
+        <input type="number" id="pa_main_sat" step="0.1" placeholder="%" oninput="calc()">
+        <span class="unit">%</span>
+        &nbsp;&nbsp;
+        <label>PA left</label>
+        <input type="number" id="pa_left_sat" step="0.1" placeholder="%" oninput="calc()">
+        <span class="unit">%</span>
+        &nbsp;&nbsp;
+        <label>PA right</label>
+        <input type="number" id="pa_right_sat" step="0.1" placeholder="%" oninput="calc()">
+        <span class="unit">%</span>
+      </div>
+
+      <div class="hint">Collect all samples within a few minutes to minimize fluctuation from anxiety/wakefulness changes.</div>
+    </div>
+  </div>
+
 </div>
 
 <!-- ==================== RIGHT PANEL: RESULTS ==================== -->
 <div class="panel panel-right">
+
+<div id="rhcResults">
 
   <!-- O2 CONTENT -->
   <div class="section">
@@ -922,11 +1052,167 @@
     <textarea id="copyText" readonly></textarea>
   </div>
 
+</div><!-- end rhcResults -->
+
+<!-- ==================== SHUNT RESULTS ==================== -->
+<div id="shuntResults" style="display:none;">
+
+  <!-- MIXED VENOUS O2 -->
+  <div class="section">
+    <div class="section-head">Mixed Venous O₂</div>
+    <div class="section-body">
+      <div class="result-row">
+        <span class="result-label">MV O₂</span>
+        <span class="result-value" id="r_mvo2">—</span>
+        <span class="result-unit">%</span>
+        <span class="result-range">Flamm formula</span>
+      </div>
+      <div style="font-size:11px; color:#666; margin-top:4px;" id="mvo2_math"></div>
+    </div>
+  </div>
+
+  <!-- O2 STEP-UP DETECTION -->
+  <div class="section">
+    <div class="section-head">O₂ Step-Up Detection &amp; Localization</div>
+    <div class="section-body" id="stepUpResults">
+      <div class="info-box">Enter oximetry run values to detect step-ups.</div>
+    </div>
+  </div>
+
+  <!-- SHUNT QUANTIFICATION -->
+  <div class="section">
+    <div class="section-head">Shunt Quantification</div>
+    <div class="section-body">
+      <div class="result-row">
+        <span class="result-label">Qp/Qs</span>
+        <span class="result-value" id="r_qpqs">—</span>
+        <span class="result-unit">(ratio)</span>
+        <span class="result-flag" id="f_qpqs"></span>
+      </div>
+      <div style="font-size:11px; color:#666; margin-top:2px;" id="qpqs_math"></div>
+      <div class="divider"></div>
+      <div class="result-row">
+        <span class="result-label">Qp</span>
+        <span class="result-value" id="r_qp">—</span>
+        <span class="result-unit">L/min</span>
+        <span class="result-range">pulmonary flow</span>
+      </div>
+      <div class="result-row">
+        <span class="result-label">Qs</span>
+        <span class="result-value" id="r_qs">—</span>
+        <span class="result-unit">L/min</span>
+        <span class="result-range">systemic flow</span>
+      </div>
+      <div class="result-row">
+        <span class="result-label">Q effective</span>
+        <span class="result-value" id="r_qeff">—</span>
+        <span class="result-unit">L/min</span>
+        <span class="result-range">non-shunted flow</span>
+      </div>
+      <div class="divider"></div>
+      <div class="result-row">
+        <span class="result-label">L→R shunt</span>
+        <span class="result-value" id="r_lr_shunt">—</span>
+        <span class="result-unit">L/min</span>
+      </div>
+      <div class="result-row">
+        <span class="result-label">R→L shunt</span>
+        <span class="result-value" id="r_rl_shunt">—</span>
+        <span class="result-unit">L/min</span>
+      </div>
+      <div style="font-size:11px; color:#666; margin-top:4px;" id="shunt_flow_math"></div>
+      <div class="divider"></div>
+      <table class="vals" style="margin-top:4px;">
+        <tr><th>Qp/Qs</th><th>Interpretation</th></tr>
+        <tr><td>&lt; 1.0</td><td>Net right-to-left shunt</td></tr>
+        <tr><td>1.0–1.4</td><td>No significant shunt</td></tr>
+        <tr><td>1.5–1.9</td><td>Small-moderate L→R shunt</td></tr>
+        <tr><td>2.0–2.9</td><td>Large L→R shunt (consider repair)</td></tr>
+        <tr class="severe"><td>≥ 3.0</td><td>Very large L→R shunt (repair indicated)</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- SHUNT-ADJUSTED VASCULAR RESISTANCE -->
+  <div class="section">
+    <div class="section-head">Shunt-Adjusted Vascular Resistance</div>
+    <div class="section-body">
+      <div class="result-row">
+        <span class="result-label">PVR (Qp)</span>
+        <span class="result-value" id="r_pvr_shunt">—</span>
+        <span class="result-unit">WU</span>
+        <span class="result-range">normal: &lt; 2</span>
+        <span class="result-flag" id="f_pvr_shunt"></span>
+      </div>
+      <div class="result-row">
+        <span class="result-label">SVR (Qs)</span>
+        <span class="result-value" id="r_svr_shunt">—</span>
+        <span class="result-unit">WU</span>
+        <span class="result-range">normal: 10–20</span>
+        <span class="result-flag" id="f_svr_shunt"></span>
+      </div>
+      <div class="result-row">
+        <span class="result-label">PVR/SVR</span>
+        <span class="result-value" id="r_pvr_svr_ratio">—</span>
+        <span class="result-unit">(ratio)</span>
+        <span class="result-range">&gt; 0.67 = Eisenmenger concern</span>
+        <span class="result-flag" id="f_pvr_svr_ratio"></span>
+      </div>
+      <div id="eisenmengerWarning"></div>
+      <div class="info-box" style="margin-top:6px;">In shunt physiology, use Qp (not TD CO) for PVR and Qs for SVR.</div>
+    </div>
+  </div>
+
+  <!-- SHUNT QUALITY CHECKS -->
+  <div class="section">
+    <div class="section-head">Shunt Quality Checks</div>
+    <div class="section-body" id="shuntQualityChecks">
+      <div class="info-box">Enter oximetry run values to see quality checks.</div>
+    </div>
+  </div>
+
+  <!-- SHUNT COPY SECTION -->
+  <div class="copy-section">
+    <div class="copy-head">
+      <span>SHUNT EVALUATION REPORT</span>
+      <div style="display:flex; align-items:center; gap:12px;">
+        <label style="display:flex; align-items:center; gap:5px; font-weight:400; font-size:11px; cursor:pointer; min-width:auto; color:#ccc;">
+          <input type="checkbox" id="shuntPlainTextToggle" onchange="calc()" style="width:14px; height:14px; cursor:pointer;">
+          Plain text (EHR)
+        </label>
+        <button class="copy-btn" id="shuntCopyBtn" onclick="copyShuntResults()">Copy to Clipboard</button>
+      </div>
+    </div>
+    <textarea id="shuntCopyText" readonly style="width:100%; min-height:300px; padding:12px 14px; font-family:'SF Mono','Menlo','Courier New',monospace; font-size:12px; line-height:1.55; border:none; resize:vertical; color:#333; background:#fafbfc;"></textarea>
+  </div>
+
+</div><!-- end shuntResults -->
+
 </div>
 
 </div>
 
 <script>
+// ===================== TAB SWITCHING =====================
+let currentTab = 'rhc';
+function switchTab(tab) {
+  currentTab = tab;
+  document.getElementById('tabRhc').classList.toggle('active', tab === 'rhc');
+  document.getElementById('tabShunt').classList.toggle('active', tab === 'shunt');
+  document.getElementById('rhcResults').style.display = tab === 'rhc' ? 'block' : 'none';
+  document.getElementById('shuntResults').style.display = tab === 'shunt' ? 'block' : 'none';
+  document.getElementById('gorlinInputSection').style.display = tab === 'rhc' ? 'block' : 'none';
+  document.getElementById('shuntInputSection').style.display = tab === 'shunt' ? 'block' : 'none';
+  document.getElementById('coSourceSection').style.display = tab === 'rhc' ? 'block' : 'none';
+  calc();
+}
+
+// ===================== PV O2 SOURCE =====================
+function handlePvO2Source() {
+  const src = document.getElementById('pvo2_source').value;
+  document.getElementById('pvO2ManualRow').style.display = (src === 'manual') ? 'flex' : 'none';
+}
+
 // ===================== HELPERS =====================
 function v(id) {
   const el = document.getElementById(id);
@@ -1279,6 +1565,10 @@ function calc() {
     td_co, tdCI, tpg, dpg, pvr, pvrDyn, pvri, svr, svrDyn, svri,
     papi, rvswi, cpo, cpi, useFick,
     ava, mva, ava_gradient, ava_sep, mva_gradient, mva_dfp);
+
+  if (currentTab === 'shunt') {
+    calcShunt();
+  }
 }
 
 // ===================== FLAG HELPERS =====================
@@ -1348,6 +1638,420 @@ function mvaLabel(val) {
   if (val <= 1.5) return 'Moderate MS (1.0–1.5)';
   if (val <= 4.0) return 'Mild MS (> 1.5)';
   return 'Normal (4–6)';
+}
+function flagQpQs(id, val) {
+  if (val === null) { clearFlag(id); return; }
+  if (val < 1.0) setFlag(id, 'Net R\u2192L', 'flag-severe');
+  else if (val < 1.5) setFlag(id, 'No significant shunt', 'flag-normal');
+  else if (val < 2.0) setFlag(id, 'Small-mod L\u2192R', 'flag-high');
+  else setFlag(id, 'Large L\u2192R', 'flag-severe');
+}
+
+// ===================== SHUNT CALCULATION =====================
+function calcShunt() {
+  const hb = v('hb');
+  const bsa = v('bsa');
+  const vo2 = v('vo2');
+  const o2k = parseFloat(document.getElementById('o2const').value);
+  const sao2_pct = v('sao2');
+  const sao2 = sao2_pct !== null ? sao2_pct / 100 : null;
+  const pa_mean = v('pa_mean');
+  const pcwp_mean = v('pcwp_mean');
+  const ao_mean = v('ao_mean');
+  const ra_mean = v('ra_mean');
+
+  // Shunt oximetry inputs
+  const svc_high = v('svc_high');
+  const svc_low = v('svc_low');
+  const ivc_sat = v('ivc_sat');
+  const ra_high_sat = v('ra_high_sat');
+  const ra_mid_sat = v('ra_mid_sat');
+  const ra_low_sat = v('ra_low_sat');
+  const rv_mid_sat = v('rv_mid_sat');
+  const rvot_sat = v('rvot_sat');
+  const pa_main_sat = v('pa_main_sat');
+  const pa_left_sat = v('pa_left_sat');
+  const pa_right_sat = v('pa_right_sat');
+  const fio2 = v('fio2') || 21;
+  const pvo2_src = document.getElementById('pvo2_source').value;
+  const pv_o2_manual = v('pv_o2_manual');
+
+  const n = (val, dec) => (val !== null && val !== undefined && !isNaN(val) && isFinite(val)) ? val.toFixed(dec === undefined ? 2 : dec) : '—';
+
+  // --- MV O2 (Flamm formula): (3 × high_SVC + IVC) / 4 ---
+  let mvo2 = null;
+  let mvo2_math = '';
+  if (svc_high !== null && ivc_sat !== null) {
+    mvo2 = (3 * svc_high + ivc_sat) / 4;
+    mvo2_math = `MV O₂ = (3 × ${n(svc_high,1)} [high SVC] + ${n(ivc_sat,1)} [IVC]) / 4 = ${n(mvo2,1)}%`;
+  } else if (svc_high !== null) {
+    // fallback: use only SVC
+    mvo2 = svc_high;
+    mvo2_math = `MV O₂ = High SVC (IVC not entered): ${n(mvo2,1)}%`;
+  }
+
+  setText('r_mvo2', mvo2 !== null ? n(mvo2,1) : '—');
+  document.getElementById('mvo2_math').textContent = mvo2_math;
+
+  // --- Mean chamber saturations ---
+  // SVC: use high SVC as primary reference
+  const svc_ref = svc_high;
+
+  // Mean RA
+  const ra_vals = [ra_high_sat, ra_mid_sat, ra_low_sat].filter(x => x !== null);
+  const ra_mean_sat = ra_vals.length > 0 ? ra_vals.reduce((a,b)=>a+b,0)/ra_vals.length : null;
+
+  // Mean RV
+  const rv_vals = [rv_mid_sat, rvot_sat].filter(x => x !== null);
+  const rv_mean_sat = rv_vals.length > 0 ? rv_vals.reduce((a,b)=>a+b,0)/rv_vals.length : null;
+
+  // PA sat: prefer PA main, else average branch PAs
+  let pa_sat = null;
+  if (pa_main_sat !== null) {
+    pa_sat = pa_main_sat;
+  } else {
+    const pa_vals = [pa_left_sat, pa_right_sat].filter(x => x !== null);
+    if (pa_vals.length > 0) pa_sat = pa_vals.reduce((a,b)=>a+b,0)/pa_vals.length;
+  }
+
+  // --- O2 Step-Up Detection ---
+  const stepUpEl = document.getElementById('stepUpResults');
+  let stepUpHtml = '';
+  let anyData = false;
+
+  // Screening: SVC → PA (threshold ≥ 8%)
+  if (svc_ref !== null && pa_sat !== null) {
+    anyData = true;
+    const screeningStepUp = pa_sat - svc_ref;
+    const screeningSig = screeningStepUp >= 8;
+    stepUpHtml += `<div class="result-row">
+      <span class="result-label" style="min-width:160px;">Screening (SVC→PA)</span>
+      <span class="result-value" style="${screeningSig ? 'color:var(--red)' : ''}">${n(screeningStepUp,1)}%</span>
+      <span class="result-range">${screeningSig ? '≥ 8% — <b>significant</b>' : '< 8% — no significant shunt'}</span>
+    </div>`;
+    if (screeningSig) {
+      stepUpHtml += `<div class="info-box" style="margin:4px 0;">Significant screening step-up detected. Localizing...</div>`;
+    }
+  }
+
+  // Atrial: SVC → mean RA (threshold ≥ 7%)
+  if (svc_ref !== null && ra_mean_sat !== null) {
+    anyData = true;
+    const atrialStepUp = ra_mean_sat - svc_ref;
+    const atrialSig = atrialStepUp >= 7;
+    stepUpHtml += `<div class="result-row">
+      <span class="result-label" style="min-width:160px;">Atrial (SVC→RA)</span>
+      <span class="result-value" style="${atrialSig ? 'color:var(--red)' : ''}">${n(atrialStepUp,1)}%</span>
+      <span class="result-range">${atrialSig ? '≥ 7% — <b>atrial-level shunt</b> (ASD, PAPVR, sinus venosus, coronary fistula to RA)' : '< 7% — no atrial step-up'}</span>
+    </div>`;
+  }
+
+  // Ventricular: mean RA → mean RV (threshold ≥ 5%)
+  if (ra_mean_sat !== null && rv_mean_sat !== null) {
+    anyData = true;
+    const ventriclStepUp = rv_mean_sat - ra_mean_sat;
+    const ventriclSig = ventriclStepUp >= 5;
+    stepUpHtml += `<div class="result-row">
+      <span class="result-label" style="min-width:160px;">Ventricular (RA→RV)</span>
+      <span class="result-value" style="${ventriclSig ? 'color:var(--red)' : ''}">${n(ventriclStepUp,1)}%</span>
+      <span class="result-range">${ventriclSig ? '≥ 5% — <b>ventricular-level shunt</b> (VSD, coronary fistula to RV)' : '< 5% — no ventricular step-up'}</span>
+    </div>`;
+  }
+
+  // Great vessel: mean RV → PA (threshold ≥ 5%)
+  if (rv_mean_sat !== null && pa_sat !== null) {
+    anyData = true;
+    const gvStepUp = pa_sat - rv_mean_sat;
+    const gvSig = gvStepUp >= 5;
+    stepUpHtml += `<div class="result-row">
+      <span class="result-label" style="min-width:160px;">Great vessel (RV→PA)</span>
+      <span class="result-value" style="${gvSig ? 'color:var(--red)' : ''}">${n(gvStepUp,1)}%</span>
+      <span class="result-range">${gvSig ? '≥ 5% — <b>great vessel-level shunt</b> (PDA, aortopulmonary window, coronary fistula to PA)' : '< 5% — no great vessel step-up'}</span>
+    </div>`;
+  }
+
+  if (!anyData) {
+    stepUpHtml = '<div class="info-box">Enter SVC and PA saturations for step-up analysis.</div>';
+  }
+  stepUpEl.innerHTML = stepUpHtml;
+
+  // --- PV O2 ---
+  let pvo2_pct = null;
+  let pvo2_label = '';
+  const pvo2SrcEl = document.getElementById('pvo2_source');
+  const pvo2SrcText = pvo2SrcEl.options[pvo2SrcEl.selectedIndex].text;
+  if (pvo2_src === 'assume_sa') {
+    pvo2_pct = sao2_pct;
+    pvo2_label = 'Assumed = SaO₂';
+  } else if (pvo2_src === 'assume_98') {
+    pvo2_pct = 98;
+    pvo2_label = 'Assumed 98%';
+  } else if (pvo2_src === 'manual') {
+    pvo2_pct = pv_o2_manual;
+    pvo2_label = 'Manual entry';
+  }
+  const pvo2 = pvo2_pct !== null ? pvo2_pct / 100 : null;
+  const pa_sat_dec = pa_sat !== null ? pa_sat / 100 : null;
+  const mvo2_dec = mvo2 !== null ? mvo2 / 100 : null;
+
+  // --- Qp/Qs ---
+  let qpqs = null;
+  let qpqs_math = '';
+  if (sao2 !== null && mvo2_dec !== null && pvo2 !== null && pa_sat_dec !== null) {
+    const num = sao2 - mvo2_dec;
+    const den = pvo2 - pa_sat_dec;
+    if (Math.abs(den) > 0.001) {
+      qpqs = num / den;
+      qpqs_math = `Qp/Qs = (SA O₂ − MV O₂) / (PV O₂ − PA O₂)\n      = (${n(sao2_pct,1)}% − ${n(mvo2,1)}%) / (${n(pvo2_pct,1)}% − ${n(pa_sat,1)}%)\n      = ${n(qpqs,2)}`;
+    }
+  }
+  setText('r_qpqs', qpqs !== null ? n(qpqs,2) : '—');
+  flagQpQs('f_qpqs', qpqs);
+  document.getElementById('qpqs_math').textContent = qpqs_math;
+
+  // --- Absolute flows (Fick-based) ---
+  let qp = null, qs = null, qeff = null, lr_shunt = null, rl_shunt = null;
+  let flow_math = '';
+  if (vo2 !== null && hb !== null && o2k !== null && pvo2 !== null && pa_sat_dec !== null) {
+    const pv_pa_diff = pvo2 - pa_sat_dec;
+    if (Math.abs(pv_pa_diff) > 0.001) {
+      qp = vo2 / (hb * o2k * pv_pa_diff * 10);
+    }
+  }
+  if (vo2 !== null && hb !== null && o2k !== null && sao2 !== null && mvo2_dec !== null) {
+    const sa_mv_diff = sao2 - mvo2_dec;
+    if (Math.abs(sa_mv_diff) > 0.001) {
+      qs = vo2 / (hb * o2k * sa_mv_diff * 10);
+    }
+  }
+  if (vo2 !== null && hb !== null && o2k !== null && pvo2 !== null && mvo2_dec !== null) {
+    const pv_mv_diff = pvo2 - mvo2_dec;
+    if (Math.abs(pv_mv_diff) > 0.001) {
+      qeff = vo2 / (hb * o2k * pv_mv_diff * 10);
+    }
+  }
+  if (qp !== null && qeff !== null) lr_shunt = qp - qeff;
+  if (qs !== null && qeff !== null) rl_shunt = qs - qeff;
+
+  if (qp !== null && qs !== null && qeff !== null) {
+    flow_math = `Hb: ${n(hb,1)} g/dL, O₂ binding: ${o2k}, VO₂: ${n(vo2,1)} mL/min\nQp = VO₂/[(Hb×${o2k}×(PV−PA))×10] = ${n(vo2,0)}/[(${n(hb,1)}×${o2k}×${n((pvo2!==null&&pa_sat_dec!==null)?(pvo2-pa_sat_dec)*100:null,1)}%)×10] = ${n(qp,2)} L/min\nQs = VO₂/[(Hb×${o2k}×(SA−MV))×10] = ${n(qs,2)} L/min\nQ eff = ${n(qeff,2)} L/min`;
+  }
+
+  setText('r_qp', qp !== null ? n(qp,2) : '—');
+  setText('r_qs', qs !== null ? n(qs,2) : '—');
+  setText('r_qeff', qeff !== null ? n(qeff,2) : '—');
+  setText('r_lr_shunt', lr_shunt !== null ? n(Math.max(0,lr_shunt),2) : '—');
+  setText('r_rl_shunt', rl_shunt !== null ? n(Math.max(0,rl_shunt),2) : '—');
+  document.getElementById('shunt_flow_math').textContent = flow_math;
+
+  // --- Shunt-adjusted vascular resistance ---
+  let pvr_shunt = null, svr_shunt = null, pvr_svr_ratio = null;
+  if (pa_mean !== null && pcwp_mean !== null && qp !== null && qp > 0) {
+    pvr_shunt = (pa_mean - pcwp_mean) / qp;
+  }
+  if (ao_mean !== null && ra_mean !== null && qs !== null && qs > 0) {
+    svr_shunt = (ao_mean - ra_mean) / qs;
+  }
+  if (pvr_shunt !== null && svr_shunt !== null && svr_shunt > 0) {
+    pvr_svr_ratio = pvr_shunt / svr_shunt;
+  }
+
+  setText('r_pvr_shunt', pvr_shunt !== null ? n(pvr_shunt,2) : '—');
+  setText('r_svr_shunt', svr_shunt !== null ? n(svr_shunt,2) : '—');
+  setText('r_pvr_svr_ratio', pvr_svr_ratio !== null ? n(pvr_svr_ratio,2) : '—');
+  flagPVR('f_pvr_shunt', pvr_shunt);
+  flagSVR('f_svr_shunt', svr_shunt);
+
+  // PVR/SVR flag
+  if (pvr_svr_ratio !== null) {
+    if (pvr_svr_ratio > 0.67) setFlag('f_pvr_svr_ratio', 'Eisenmenger concern', 'flag-severe');
+    else setFlag('f_pvr_svr_ratio', 'OK', 'flag-normal');
+  } else {
+    clearFlag('f_pvr_svr_ratio');
+  }
+
+  // Eisenmenger warning
+  const eisenEl = document.getElementById('eisenmengerWarning');
+  const eisenmenger = (pvr_shunt !== null && pvr_shunt > 6) || (pvr_svr_ratio !== null && pvr_svr_ratio > 0.67);
+  if (eisenmenger) {
+    eisenEl.innerHTML = '<div class="error-box"><b>Eisenmenger physiology concern:</b> PVR > 6 WU or PVR/SVR > 0.67. Shunt closure may be contraindicated. Cardiology/PH specialist consultation required.</div>';
+  } else {
+    eisenEl.innerHTML = '';
+  }
+
+  // --- Shunt Quality Checks ---
+  buildShuntQualityChecks(fio2, sao2_pct, qpqs, pvr_shunt, pvr_svr_ratio, mvo2, vo2, svc_high, pa_sat);
+
+  // --- Shunt Copy Text ---
+  buildShuntCopyText({
+    fio2, pvo2_label: pvo2SrcText, svc_high, svc_low, ivc_sat,
+    ra_high_sat, ra_mid_sat, ra_low_sat, rv_mid_sat, rvot_sat,
+    pa_main_sat, pa_left_sat, pa_right_sat,
+    mvo2, sao2_pct, pvo2_pct, pa_sat,
+    qpqs, qp, qs, qeff, lr_shunt, rl_shunt,
+    hb, o2k, vo2, pvr_shunt, svr_shunt, pvr_svr_ratio,
+    pa_mean, pcwp_mean, ao_mean, ra_mean, n
+  });
+}
+
+// ===================== SHUNT QUALITY CHECKS =====================
+function buildShuntQualityChecks(fio2, sao2_pct, qpqs, pvr_shunt, pvr_svr_ratio, mvo2, vo2, svc_high, pa_sat) {
+  const el = document.getElementById('shuntQualityChecks');
+  const checks = [];
+
+  if (fio2 > 30) {
+    checks.push({type:'warn', msg:`FiO₂ ${fio2}% > 30%: simplified Qp/Qs ratio is inaccurate at high FiO₂. Full O₂ content equation required.`});
+  }
+  if (sao2_pct !== null && sao2_pct < 95) {
+    checks.push({type:'warn', msg:`SaO₂ ${sao2_pct}% < 95% on room air — suggests R→L shunt or underlying lung disease. Check PV O₂ source.`});
+  }
+  if (svc_high !== null && pa_sat !== null && (pa_sat - svc_high) >= 8 && qpqs !== null && qpqs >= 1.0 && qpqs < 1.5) {
+    checks.push({type:'warn', msg:`Screening step-up ≥ 8% but Qp/Qs 1.0–1.5 — consider bidirectional shunting or sampling variability.`});
+  }
+  if (pvr_shunt !== null && pvr_shunt > 6) {
+    checks.push({type:'error', msg:`PVR ${pvr_shunt.toFixed(2)} WU > 6: Eisenmenger physiology. Shunt closure likely contraindicated.`});
+  }
+  if (pvr_svr_ratio !== null && pvr_svr_ratio > 0.67) {
+    checks.push({type:'warn', msg:`PVR/SVR > 0.67 (${pvr_svr_ratio.toFixed(2)}): Eisenmenger concern. Evaluate carefully before intervention.`});
+  }
+  if (mvo2 !== null && mvo2 > 80) {
+    checks.push({type:'warn', msg:`MV O₂ ${mvo2.toFixed(1)}% > 80%: very high mixed venous sat — consider high output state, incomplete mixing, or sampling error.`});
+  }
+  if (vo2 !== null && document.getElementById('vo2source').value === 'estimated') {
+    checks.push({type:'warn', msg:'VO₂ estimated at 125 mL/min/m². Absolute flow calculations (Qp, Qs) may have ±25% error. Use LaFarge or measured VO₂ when possible.'});
+  }
+
+  if (checks.length === 0) {
+    el.innerHTML = '<div class="info-box">No issues detected. Enter more values for additional checks.</div>';
+    return;
+  }
+  el.innerHTML = checks.map(c => {
+    if (c.type === 'error') return `<div class="error-box">${c.msg}</div>`;
+    if (c.type === 'warn') return `<div class="warning-box">${c.msg}</div>`;
+    return `<div class="info-box">${c.msg}</div>`;
+  }).join('');
+}
+
+// ===================== SHUNT COPY TEXT =====================
+function buildShuntCopyText(d) {
+  const {fio2, pvo2_label, svc_high, svc_low, ivc_sat,
+    ra_high_sat, ra_mid_sat, ra_low_sat, rv_mid_sat, rvot_sat,
+    pa_main_sat, pa_left_sat, pa_right_sat,
+    mvo2, sao2_pct, pvo2_pct, pa_sat,
+    qpqs, qp, qs, qeff, lr_shunt, rl_shunt,
+    hb, o2k, vo2, pvr_shunt, svr_shunt, pvr_svr_ratio,
+    pa_mean, pcwp_mean, ao_mean, ra_mean, n} = d;
+
+  let t = '';
+  t += 'SHUNT EVALUATION\n';
+  t += `FiO₂: ${fio2}%\n`;
+  t += `PV O₂ source: ${pvo2_label}\n`;
+
+  t += '\nOXIMETRY RUN (O₂ saturations, %)\n';
+  if (svc_high !== null) t += `  High SVC: ${n(svc_high,1)}%\n`;
+  if (svc_low !== null) t += `  Low SVC: ${n(svc_low,1)}%\n`;
+  if (ivc_sat !== null) t += `  IVC: ${n(ivc_sat,1)}%\n`;
+  if (ra_high_sat !== null) t += `  RA high: ${n(ra_high_sat,1)}%\n`;
+  if (ra_mid_sat !== null) t += `  RA mid: ${n(ra_mid_sat,1)}%\n`;
+  if (ra_low_sat !== null) t += `  RA low: ${n(ra_low_sat,1)}%\n`;
+  if (rv_mid_sat !== null) t += `  RV mid: ${n(rv_mid_sat,1)}%\n`;
+  if (rvot_sat !== null) t += `  RVOT: ${n(rvot_sat,1)}%\n`;
+  if (pa_main_sat !== null) t += `  PA main: ${n(pa_main_sat,1)}%\n`;
+  if (pa_left_sat !== null) t += `  PA left: ${n(pa_left_sat,1)}%\n`;
+  if (pa_right_sat !== null) t += `  PA right: ${n(pa_right_sat,1)}%\n`;
+
+  t += '\nMIXED VENOUS O₂ (Flamm formula)\n';
+  if (svc_high !== null && ivc_sat !== null) {
+    t += `  MV O₂ = (3 × ${n(svc_high,1)} [high SVC] + ${n(ivc_sat,1)} [IVC]) / 4 = ${n(mvo2,1)}%\n`;
+  } else if (mvo2 !== null) {
+    t += `  MV O₂ = ${n(mvo2,1)}% (high SVC only)\n`;
+  } else {
+    t += '  MV O₂: insufficient data\n';
+  }
+
+  t += '\nO₂ STEP-UP ANALYSIS\n';
+  // Screening
+  if (svc_high !== null && pa_sat !== null) {
+    const su = pa_sat - svc_high;
+    t += `  Screening (SVC → PA): ${n(su,1)}% ${su >= 8 ? '(≥ 8%, significant)' : '(< 8%, no significant shunt)'}\n`;
+  }
+  // Atrial
+  const ra_vals_t = [ra_high_sat, ra_mid_sat, ra_low_sat].filter(x => x !== null);
+  const ra_mean_t = ra_vals_t.length > 0 ? ra_vals_t.reduce((a,b)=>a+b,0)/ra_vals_t.length : null;
+  if (svc_high !== null && ra_mean_t !== null) {
+    const su = ra_mean_t - svc_high;
+    t += `  Atrial (SVC → RA mean ${n(ra_mean_t,1)}%): ${n(su,1)}% ${su >= 7 ? '(≥ 7%, atrial-level shunt)' : '(< 7%)'}\n`;
+  }
+  // Ventricular
+  const rv_vals_t = [rv_mid_sat, rvot_sat].filter(x => x !== null);
+  const rv_mean_t = rv_vals_t.length > 0 ? rv_vals_t.reduce((a,b)=>a+b,0)/rv_vals_t.length : null;
+  if (ra_mean_t !== null && rv_mean_t !== null) {
+    const su = rv_mean_t - ra_mean_t;
+    t += `  Ventricular (RA → RV mean ${n(rv_mean_t,1)}%): ${n(su,1)}% ${su >= 5 ? '(≥ 5%, ventricular-level shunt)' : '(< 5%)'}\n`;
+  }
+  // Great vessel
+  if (rv_mean_t !== null && pa_sat !== null) {
+    const su = pa_sat - rv_mean_t;
+    t += `  Great vessel (RV → PA ${n(pa_sat,1)}%): ${n(su,1)}% ${su >= 5 ? '(≥ 5%, great vessel-level shunt)' : '(< 5%)'}\n`;
+  }
+
+  t += '\nSHUNT QUANTIFICATION\n';
+  if (qpqs !== null) {
+    t += `  Qp/Qs = (SA O₂ − MV O₂) / (PV O₂ − PA O₂)\n`;
+    t += `        = (${n(sao2_pct,1)} − ${n(mvo2,1)}) / (${n(pvo2_pct,1)} − ${n(pa_sat,1)})\n`;
+    t += `        = ${n(qpqs,2)}\n`;
+  } else {
+    t += '  Qp/Qs: insufficient data\n';
+  }
+
+  t += '\nABSOLUTE FLOWS (Fick-based)\n';
+  if (hb !== null) t += `  Hb (CBC): ${n(hb,1)} g/dL, O₂ binding constant: ${o2k}\n`;
+  if (vo2 !== null) t += `  VO₂: ${n(vo2,1)} mL/min\n`;
+  if (qp !== null) {
+    const pv_pa = (pvo2_pct !== null && pa_sat !== null) ? (pvo2_pct - pa_sat).toFixed(1) : '—';
+    t += `  Qp = VO₂ / [(Hb × ${o2k} × (PV O₂ − PA O₂)) × 10] = ${n(qp,2)} L/min\n`;
+  } else {
+    t += '  Qp: insufficient data\n';
+  }
+  if (qs !== null) {
+    t += `  Qs = VO₂ / [(Hb × ${o2k} × (SA O₂ − MV O₂)) × 10] = ${n(qs,2)} L/min\n`;
+  } else {
+    t += '  Qs: insufficient data\n';
+  }
+  if (qeff !== null) t += `  Q effective = ${n(qeff,2)} L/min\n`;
+  if (lr_shunt !== null) t += `  L→R shunt = Qp − Q effective = ${n(Math.max(0,lr_shunt),2)} L/min\n`;
+  if (rl_shunt !== null) t += `  R→L shunt = Qs − Q effective = ${n(Math.max(0,rl_shunt),2)} L/min\n`;
+
+  t += '\nSHUNT-ADJUSTED VASCULAR RESISTANCE\n';
+  if (pvr_shunt !== null) {
+    t += `  PVR = (mPAP − PCWP) / Qp = (${n(pa_mean,0)} − ${n(pcwp_mean,0)}) / ${n(qp,2)} = ${n(pvr_shunt,2)} WU\n`;
+  } else {
+    t += '  PVR: insufficient data\n';
+  }
+  if (svr_shunt !== null) {
+    t += `  SVR = (MAP − RAP) / Qs = (${n(ao_mean,0)} − ${n(ra_mean,0)}) / ${n(qs,2)} = ${n(svr_shunt,2)} WU\n`;
+  } else {
+    t += '  SVR: insufficient data\n';
+  }
+  if (pvr_svr_ratio !== null) {
+    t += `  PVR/SVR ratio = ${n(pvr_svr_ratio,2)}${pvr_svr_ratio > 0.67 ? ' — EISENMENGER CONCERN' : ''}\n`;
+  }
+
+  if (document.getElementById('shuntPlainTextToggle').checked) {
+    t = toPlainText(t);
+  }
+  document.getElementById('shuntCopyText').value = t;
+}
+
+// ===================== COPY SHUNT RESULTS =====================
+function copyShuntResults() {
+  const text = document.getElementById('shuntCopyText').value;
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.getElementById('shuntCopyBtn');
+    btn.textContent = 'Copied!';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = 'Copy to Clipboard'; btn.classList.remove('copied'); }, 2000);
+  });
 }
 
 // ===================== QUALITY CHECKS =====================
@@ -1633,6 +2337,11 @@ function clearAll() {
   document.getElementById('pa_catheter').value = '7.5';
   document.getElementById('td_injectate').value = 'room_10';
   document.getElementById('tdAvgHint').textContent = '';
+  // Reset shunt-specific fields
+  document.getElementById('fio2').value = '21';
+  document.getElementById('pvo2_source').value = 'assume_sa';
+  document.getElementById('pvO2ManualRow').style.display = 'none';
+  document.getElementById('shuntPlainTextToggle').checked = false;
   handleVo2Source();
   calc();
 }
