@@ -1565,8 +1565,7 @@ function toPlainText(str) {
   str = str.replace(/⁰/g,'0').replace(/¹/g,'1').replace(/²/g,'2').replace(/³/g,'3')
            .replace(/⁴/g,'4').replace(/⁵/g,'5').replace(/⁶/g,'6').replace(/⁷/g,'7')
            .replace(/⁸/g,'8').replace(/⁹/g,'9').replace(/⁻/g,'-');
-  // Middle dot → period
-  str = str.replace(/·/g,'.');
+  // Middle dot (·) left as-is — standard unit separator, widely supported
   // Delta
   str = str.replace(/ΔP/g,'dP').replace(/Δ/g,'d');
   // Square root
