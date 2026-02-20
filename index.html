@@ -716,45 +716,45 @@
   <div class="section" id="shuntInputSection" style="display:none;">
     <div class="section-head">Shunt Oximetry Run</div>
     <div class="section-body">
-      <div class="input-row">
-        <label>PV O₂</label>
-        <select id="pvo2_source" onchange="handlePvO2Source(); calc();">
-          <option value="assume_sa">Assume = SaO₂ (no R→L shunt)</option>
-          <option value="assume_98">Assume 98% (room air)</option>
-          <option value="manual">Enter manually (wedge PA sample)</option>
-        </select>
-      </div>
-      <div class="input-row" id="pvO2ManualRow" style="display:none;">
-        <label>PV O₂</label>
-        <input type="number" id="pv_o2_manual" step="0.1" placeholder="%" oninput="calc()">
-        <span class="unit">%</span>
-      </div>
-      <div class="input-row">
-        <label>FiO₂</label>
-        <input type="number" id="fio2" step="1" placeholder="21" value="21" oninput="calc()">
-        <span class="unit">%</span>
-        <span class="hint" style="margin-left:8px;">Room air = 21%. If &gt; 30%, must use full O₂ content equation.</span>
+
+      <div class="info-box" style="font-size:11px; margin-bottom:8px;">
+        <b>Workflow:</b> On routine RHC, draw <b>1 SVC + 1 PA</b> sample. If PA sat is ≥ 8% higher than SVC → significant L→R shunt suspected → perform full oximetry run below to localize the shunt level and quantify Qp/Qs.
       </div>
 
-      <div class="subsection">SVC</div>
+      <div class="subsection">Screening (minimum required)</div>
       <div class="input-row">
         <label>High SVC</label>
         <input type="number" id="svc_high" step="0.1" placeholder="%" oninput="calc()">
         <span class="unit">%</span>
         &nbsp;&nbsp;
+        <label>PA main</label>
+        <input type="number" id="pa_main_sat" step="0.1" placeholder="%" oninput="calc()">
+        <span class="unit">%</span>
+      </div>
+      <div class="hint">These two samples alone detect most L→R shunts (≥ 8% step-up = significant).</div>
+
+      <div class="divider"></div>
+
+      <div class="subsection">Full Oximetry Run (for localization &amp; Qp/Qs)</div>
+      <div class="hint" style="margin-bottom:6px;">Enter all samples obtained. At minimum, need SVC + IVC (for MV O₂) and PA (for Qp/Qs). More samples = better localization. RA best sampled at mid-RA level.</div>
+
+      <div class="subsection" style="color:var(--blue); border-bottom-color:var(--blue);">SVC</div>
+      <div class="input-row">
         <label>Low SVC</label>
         <input type="number" id="svc_low" step="0.1" placeholder="%" oninput="calc()">
         <span class="unit">%</span>
+        <span class="hint" style="margin-left:6px;">High SVC entered above</span>
       </div>
 
-      <div class="subsection">IVC</div>
+      <div class="subsection" style="color:var(--blue); border-bottom-color:var(--blue);">IVC <span style="font-weight:400; font-size:10px; color:#999;">(needed for MV O₂)</span></div>
       <div class="input-row">
         <label>IVC</label>
         <input type="number" id="ivc_sat" step="0.1" placeholder="%" oninput="calc()">
         <span class="unit">%</span>
+        <span class="hint" style="margin-left:6px;">At level of diaphragm, beyond renal veins</span>
       </div>
 
-      <div class="subsection">Right Atrium</div>
+      <div class="subsection" style="color:var(--blue); border-bottom-color:var(--blue);">Right Atrium <span style="font-weight:400; font-size:10px; color:#999;">(step-up here → ASD)</span></div>
       <div class="input-row">
         <label>RA high</label>
         <input type="number" id="ra_high_sat" step="0.1" placeholder="%" oninput="calc()">
@@ -768,8 +768,9 @@
         <input type="number" id="ra_low_sat" step="0.1" placeholder="%" oninput="calc()">
         <span class="unit">%</span>
       </div>
+      <div class="hint">Mid-RA least affected by IVC/coronary sinus streaming. Multiple samples preferred.</div>
 
-      <div class="subsection">Right Ventricle</div>
+      <div class="subsection" style="color:var(--blue); border-bottom-color:var(--blue);">Right Ventricle <span style="font-weight:400; font-size:10px; color:#999;">(step-up here → VSD)</span></div>
       <div class="input-row">
         <label>RV mid</label>
         <input type="number" id="rv_mid_sat" step="0.1" placeholder="%" oninput="calc()">
@@ -780,11 +781,9 @@
         <span class="unit">%</span>
       </div>
 
-      <div class="subsection">Pulmonary Artery</div>
+      <div class="subsection" style="color:var(--blue); border-bottom-color:var(--blue);">Pulmonary Artery <span style="font-weight:400; font-size:10px; color:#999;">(step-up here → PDA)</span></div>
       <div class="input-row">
-        <label>PA main</label>
-        <input type="number" id="pa_main_sat" step="0.1" placeholder="%" oninput="calc()">
-        <span class="unit">%</span>
+        <span class="hint">PA main entered above in screening</span>
         &nbsp;&nbsp;
         <label>PA left</label>
         <input type="number" id="pa_left_sat" step="0.1" placeholder="%" oninput="calc()">
@@ -795,7 +794,31 @@
         <span class="unit">%</span>
       </div>
 
-      <div class="hint">Collect all samples within a few minutes to minimize fluctuation from anxiety/wakefulness changes.</div>
+      <div class="divider"></div>
+
+      <div class="subsection">PV O₂ &amp; FiO₂</div>
+      <div class="input-row">
+        <label>PV O₂</label>
+        <select id="pvo2_source" onchange="handlePvO2Source(); calc();">
+          <option value="assume_sa">Assume = SaO₂ (no R→L shunt)</option>
+          <option value="assume_98">Assume 98% (room air)</option>
+          <option value="manual">Enter manually (wedge PA sample)</option>
+        </select>
+      </div>
+      <div class="input-row" id="pvO2ManualRow" style="display:none;">
+        <label>PV O₂</label>
+        <input type="number" id="pv_o2_manual" step="0.1" placeholder="%" oninput="calc()">
+        <span class="unit">%</span>
+      </div>
+      <div class="hint">If SaO₂ ≥ 95% on room air → no significant R→L shunt → PV O₂ ≈ SaO₂. If R→L shunt suspected, use wedge PA sample or assume 98%.</div>
+      <div class="input-row" style="margin-top:4px;">
+        <label>FiO₂</label>
+        <input type="number" id="fio2" step="1" placeholder="21" value="21" oninput="calc()">
+        <span class="unit">%</span>
+        <span class="hint" style="margin-left:8px;">Room air = 21%. If &gt; 30%, simplified Qp/Qs is inaccurate — must use full O₂ content with dissolved O₂.</span>
+      </div>
+
+      <div class="hint" style="margin-top:8px;">Collect all samples within a few minutes to minimize error from fluctuations in anxiety/wakefulness.</div>
     </div>
   </div>
 
