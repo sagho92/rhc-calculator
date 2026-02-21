@@ -2347,6 +2347,23 @@ function loadExample() {
   document.getElementById('td2').value = '1.48';
   document.getElementById('td3').value = '1.45';
   calcTD();
+
+  // Shunt oximetry example (ASD with PH — Hanna & Glancy, Ch. III)
+  document.getElementById('svc_high').value = '70';
+  document.getElementById('svc_low').value = '83';
+  document.getElementById('ivc_sat').value = '74';
+  document.getElementById('ra_high_sat').value = '84';
+  document.getElementById('ra_mid_sat').value = '84';
+  document.getElementById('ra_low_sat').value = '';
+  document.getElementById('rv_mid_sat').value = '82';
+  document.getElementById('rvot_sat').value = '';
+  document.getElementById('pa_main_sat').value = '84';
+  document.getElementById('pa_left_sat').value = '';
+  document.getElementById('pa_right_sat').value = '';
+  document.getElementById('pvo2_source').value = 'assume_sa';
+  handlePvO2Source();
+  document.getElementById('fio2').value = '21';
+
   calc();
 }
 
