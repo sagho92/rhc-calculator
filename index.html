@@ -287,7 +287,7 @@
   .copy-btn:hover { background: #388e3c; }
   .copy-btn:active { transform: scale(0.97); }
   .copy-btn.copied { background: #1565c0; }
-  #copyText {
+  .copy-section textarea {
     width: 100%;
     min-height: 300px;
     padding: 12px 14px;
@@ -383,7 +383,7 @@
   body.dark .error-box { background: #331a1a; border-left-color: #c62828; color: #e8a0a0; }
   body.dark .info-box { background: #1a2533; border-left-color: #4a90d9; color: #a0c4e8; }
   body.dark .copy-head { background: #1a1d23; }
-  body.dark #copyText { background: #1e2128; color: #d0d4dc; border-top: 1px solid #333; }
+  body.dark .copy-section textarea { background: #1e2128; color: #d0d4dc; border-top: 1px solid #333; }
   body.dark .flag-low { background: #3d1f2a; color: #ef9a9a; }
   body.dark .flag-high { background: #3d2f1f; color: #ffcc80; }
   body.dark .flag-severe { background: #4a1a1a; color: #ef5350; }
@@ -1078,7 +1078,7 @@
   <!-- COPY SECTION -->
   <div class="copy-section">
     <div class="copy-head">
-      <span>COPY-PASTE REPORT</span>
+      <span>EVALUATION REPORT</span>
       <div style="display:flex; align-items:center; gap:12px;">
         <label style="display:flex; align-items:center; gap:5px; font-weight:400; font-size:11px; cursor:pointer; min-width:auto; color:#ccc;">
           <input type="checkbox" id="plainTextToggle" onchange="calc()" style="width:14px; height:14px; cursor:pointer;">
@@ -1220,7 +1220,7 @@
   <!-- SHUNT COPY SECTION -->
   <div class="copy-section">
     <div class="copy-head">
-      <span>SHUNT EVALUATION REPORT</span>
+      <span>EVALUATION REPORT</span>
       <div style="display:flex; align-items:center; gap:12px;">
         <label style="display:flex; align-items:center; gap:5px; font-weight:400; font-size:11px; cursor:pointer; min-width:auto; color:#ccc;">
           <input type="checkbox" id="shuntPlainTextToggle" onchange="calc()" style="width:14px; height:14px; cursor:pointer;">
@@ -1229,7 +1229,7 @@
         <button class="copy-btn" id="shuntCopyBtn" onclick="copyShuntResults()">Copy to Clipboard</button>
       </div>
     </div>
-    <textarea id="shuntCopyText" readonly style="width:100%; min-height:300px; padding:12px 14px; font-family:'SF Mono','Menlo','Courier New',monospace; font-size:12px; line-height:1.55; border:none; resize:vertical; color:#333; background:#fafbfc;"></textarea>
+    <textarea id="shuntCopyText" readonly></textarea>
   </div>
 
 </div><!-- end shuntResults -->
@@ -1320,23 +1320,23 @@ function handleVo2Source() {
     hint.textContent = 'LaFarge: VO₂ = [138.1 − (k × ln(age)) + (0.378 × HR)] × BSA   (k = 11.49 M, 17.04 F)';
     lafargeRow.style.display = 'block';
     vo2Input.readOnly = true;
-    vo2Input.style.background = '#e8f5e9';
+    vo2Input.style.background = document.body.classList.contains('dark') ? '#1a2e1a' : '#e8f5e9';
     calcLaFarge();
   } else if (src === 'lafarge_manual') {
     hint.textContent = 'Document: "estimated VO₂ via LaFarge equation (cath lab software)"';
     lafargeRow.style.display = 'none';
     vo2Input.readOnly = false;
-    vo2Input.style.background = '#fafbfc';
+    vo2Input.style.background = '';
   } else if (src === 'measured') {
     hint.textContent = 'Document: "measured VO₂ via metabolic cart"';
     lafargeRow.style.display = 'none';
     vo2Input.readOnly = false;
-    vo2Input.style.background = '#fafbfc';
+    vo2Input.style.background = '';
   } else {
     hint.textContent = 'VO₂ = 125 × BSA. Less accurate — use LaFarge if available.';
     lafargeRow.style.display = 'none';
     vo2Input.readOnly = false;
-    vo2Input.style.background = '#fafbfc';
+    vo2Input.style.background = '';
     const bsa = v('bsa');
     if (bsa) {
       vo2Input.value = (125 * bsa).toFixed(1);
@@ -2442,6 +2442,7 @@ function toggleDark() {
   const isDark = document.body.classList.contains('dark');
   btn.textContent = isDark ? 'Light Mode' : 'Dark Mode';
   try { localStorage.setItem('rhc_dark', isDark ? '1' : '0'); } catch(e) {}
+  handleVo2Source();
 }
 // Restore preference
 try {
