@@ -397,6 +397,93 @@
   body.dark table.vals td { border-bottom-color: #2e323c; }
   body.dark table.vals tr.severe td { color: #ef5350; }
 
+  /* AFIB GORLIN */
+  .afib-toggle {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #fffde7;
+    border: 1px solid #f9a825;
+    border-radius: 6px;
+    padding: 6px 10px;
+    margin-bottom: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #7b6b00;
+  }
+  .afib-toggle input[type="checkbox"] { width: 16px; height: 16px; cursor: pointer; }
+  .afib-toggle label { cursor: pointer; min-width: auto; font-weight: 600; }
+  .afib-beats-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 4px 0;
+    font-size: 12px;
+  }
+  .afib-beats-table th {
+    background: var(--navy);
+    color: #fff;
+    padding: 4px 6px;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+  }
+  .afib-beats-table td {
+    padding: 2px 4px;
+    border-bottom: 1px solid #eee;
+    text-align: center;
+  }
+  .afib-beats-table td:first-child {
+    font-weight: 700;
+    color: #888;
+    font-size: 11px;
+    width: 32px;
+  }
+  .afib-beats-table input[type="number"] { width: 64px; font-size: 12px; padding: 3px 4px; }
+  .afib-beats-table .af-result {
+    font-family: "SF Mono", "Menlo", monospace;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--navy);
+    min-width: 50px;
+  }
+  .afib-avg-row {
+    background: #e8f5e9;
+    border: 1px solid #43a047;
+    border-radius: 6px;
+    padding: 6px 10px;
+    margin: 6px 0;
+    font-size: 13px;
+    font-weight: 700;
+    color: #2e7d32;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .afib-avg-row .avg-value {
+    font-family: "SF Mono", "Menlo", monospace;
+    font-size: 16px;
+  }
+  .afib-detail {
+    background: #f5f5f5;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    padding: 8px 10px;
+    margin: 6px 0;
+    font-size: 11px;
+    font-family: "SF Mono", "Menlo", monospace;
+    line-height: 1.6;
+  }
+
+  /* AFIB DARK MODE */
+  body.dark .afib-toggle { background: #332b1a; border-color: #b8860b; color: #e8d5a0; }
+  body.dark .afib-beats-table th { background: #1a2236; }
+  body.dark .afib-beats-table td { border-bottom-color: #3a3f4b; }
+  body.dark .afib-beats-table td:first-child { color: #9098a8; }
+  body.dark .afib-beats-table .af-result { color: #8ab4f8; }
+  body.dark .afib-avg-row { background: #1f3d2a; border-color: #43a047; color: #81c784; }
+  body.dark .afib-detail { background: #2a2e37; border-color: #3a3f4b; color: #b0b8c4; }
+
 </style>
 </head>
 <body>
@@ -679,39 +766,86 @@
     <div class="section-head">Gorlin Valve Area Calculations (Optional)</div>
     <div class="section-body">
 
-      <div class="subsection">Aortic Valve (AVA)</div>
-      <div class="input-row">
-        <label>Mean ΔP</label>
-        <input type="number" id="ava_gradient" step="0.1" placeholder="mmHg" oninput="calc()">
-        <span class="unit">mmHg (transaortic gradient)</span>
+      <div class="afib-toggle">
+        <input type="checkbox" id="afibToggle" onchange="toggleAfib()">
+        <label for="afibToggle">AFib mode — beat-by-beat Gorlin averaging</label>
       </div>
-      <div class="input-row">
-        <label>Eject time</label>
-        <input type="number" id="ava_ejtime" step="0.01" placeholder="sec/beat" oninput="calcSEP(); calc();">
-        <span class="unit">sec/beat</span>
-        <span style="margin:0 6px; color:#999;">→</span>
-        <label>SEP</label>
-        <input type="number" id="ava_sep" step="0.1" placeholder="sec/min" oninput="calc()">
-        <span class="unit">sec/min</span>
-      </div>
-      <div class="hint">SEP = ejection time/beat × HR. Typical: 0.30–0.35 sec/beat → 20–25 sec/min. Measured from AV open to dicrotic notch.</div>
 
-      <div class="subsection" style="margin-top:10px;">Mitral Valve (MVA)</div>
-      <div class="input-row">
-        <label>Mean ΔP</label>
-        <input type="number" id="mva_gradient" step="0.1" placeholder="mmHg" oninput="calc()">
-        <span class="unit">mmHg (transmitral gradient)</span>
+      <!-- SINGLE-VALUE INPUTS (non-AFib) -->
+      <div id="avaSingleInputs">
+        <div class="subsection">Aortic Valve (AVA)</div>
+        <div class="input-row">
+          <label>Mean ΔP</label>
+          <input type="number" id="ava_gradient" step="0.1" placeholder="mmHg" oninput="calc()">
+          <span class="unit">mmHg (transaortic gradient)</span>
+        </div>
+        <div class="input-row">
+          <label>Eject time</label>
+          <input type="number" id="ava_ejtime" step="0.01" placeholder="sec/beat" oninput="calcSEP(); calc();">
+          <span class="unit">sec/beat</span>
+          <span style="margin:0 6px; color:#999;">→</span>
+          <label>SEP</label>
+          <input type="number" id="ava_sep" step="0.1" placeholder="sec/min" oninput="calc()">
+          <span class="unit">sec/min</span>
+        </div>
+        <div class="hint">SEP = ejection time/beat × HR. Typical: 0.30–0.35 sec/beat → 20–25 sec/min. Measured from AV open to dicrotic notch.</div>
       </div>
-      <div class="input-row">
-        <label>Fill time</label>
-        <input type="number" id="mva_filltime" step="0.01" placeholder="sec/beat" oninput="calcDFP(); calc();">
-        <span class="unit">sec/beat</span>
-        <span style="margin:0 6px; color:#999;">→</span>
-        <label>DFP</label>
-        <input type="number" id="mva_dfp" step="0.1" placeholder="sec/min" oninput="calc()">
-        <span class="unit">sec/min</span>
+
+      <div id="mvaSingleInputs">
+        <div class="subsection" style="margin-top:10px;">Mitral Valve (MVA)</div>
+        <div class="input-row">
+          <label>Mean ΔP</label>
+          <input type="number" id="mva_gradient" step="0.1" placeholder="mmHg" oninput="calc()">
+          <span class="unit">mmHg (transmitral gradient)</span>
+        </div>
+        <div class="input-row">
+          <label>Fill time</label>
+          <input type="number" id="mva_filltime" step="0.01" placeholder="sec/beat" oninput="calcDFP(); calc();">
+          <span class="unit">sec/beat</span>
+          <span style="margin:0 6px; color:#999;">→</span>
+          <label>DFP</label>
+          <input type="number" id="mva_dfp" step="0.1" placeholder="sec/min" oninput="calc()">
+          <span class="unit">sec/min</span>
+        </div>
+        <div class="hint">DFP = filling time/beat × HR. Typical: 0.40–0.50 sec/beat → 30–40 sec/min. Shortened in tachycardia. Average ≥5 beats in AFib.</div>
       </div>
-      <div class="hint">DFP = filling time/beat × HR. Typical: 0.40–0.50 sec/beat → 30–40 sec/min. Shortened in tachycardia. Average ≥5 beats in AFib.</div>
+
+      <!-- AFIB PER-BEAT INPUTS (hidden by default) -->
+      <div id="avaAfibInputs" style="display:none;">
+        <div class="subsection">Aortic Valve (AVA) — Per-Beat Data</div>
+        <div class="hint" style="margin-bottom:4px;">Enter gradient and ejection time for each beat. Minimum 5 beats recommended. Empty rows are ignored.</div>
+        <table class="afib-beats-table">
+          <tr><th>Beat</th><th>ΔP (mmHg)</th><th>Eject time (s)</th><th>AVA (cm²)</th></tr>
+          <tr><td>1</td><td><input type="number" id="ava_af_grad_1" step="0.1" oninput="calc()"></td><td><input type="number" id="ava_af_et_1" step="0.01" oninput="calc()"></td><td class="af-result" id="ava_af_result_1">—</td></tr>
+          <tr><td>2</td><td><input type="number" id="ava_af_grad_2" step="0.1" oninput="calc()"></td><td><input type="number" id="ava_af_et_2" step="0.01" oninput="calc()"></td><td class="af-result" id="ava_af_result_2">—</td></tr>
+          <tr><td>3</td><td><input type="number" id="ava_af_grad_3" step="0.1" oninput="calc()"></td><td><input type="number" id="ava_af_et_3" step="0.01" oninput="calc()"></td><td class="af-result" id="ava_af_result_3">—</td></tr>
+          <tr><td>4</td><td><input type="number" id="ava_af_grad_4" step="0.1" oninput="calc()"></td><td><input type="number" id="ava_af_et_4" step="0.01" oninput="calc()"></td><td class="af-result" id="ava_af_result_4">—</td></tr>
+          <tr><td>5</td><td><input type="number" id="ava_af_grad_5" step="0.1" oninput="calc()"></td><td><input type="number" id="ava_af_et_5" step="0.01" oninput="calc()"></td><td class="af-result" id="ava_af_result_5">—</td></tr>
+          <tr><td>6</td><td><input type="number" id="ava_af_grad_6" step="0.1" oninput="calc()"></td><td><input type="number" id="ava_af_et_6" step="0.01" oninput="calc()"></td><td class="af-result" id="ava_af_result_6">—</td></tr>
+          <tr><td>7</td><td><input type="number" id="ava_af_grad_7" step="0.1" oninput="calc()"></td><td><input type="number" id="ava_af_et_7" step="0.01" oninput="calc()"></td><td class="af-result" id="ava_af_result_7">—</td></tr>
+          <tr><td>8</td><td><input type="number" id="ava_af_grad_8" step="0.1" oninput="calc()"></td><td><input type="number" id="ava_af_et_8" step="0.01" oninput="calc()"></td><td class="af-result" id="ava_af_result_8">—</td></tr>
+          <tr><td>9</td><td><input type="number" id="ava_af_grad_9" step="0.1" oninput="calc()"></td><td><input type="number" id="ava_af_et_9" step="0.01" oninput="calc()"></td><td class="af-result" id="ava_af_result_9">—</td></tr>
+          <tr><td>10</td><td><input type="number" id="ava_af_grad_10" step="0.1" oninput="calc()"></td><td><input type="number" id="ava_af_et_10" step="0.01" oninput="calc()"></td><td class="af-result" id="ava_af_result_10">—</td></tr>
+        </table>
+      </div>
+
+      <div id="mvaAfibInputs" style="display:none;">
+        <div class="subsection" style="margin-top:10px;">Mitral Valve (MVA) — Per-Beat Data</div>
+        <div class="hint" style="margin-bottom:4px;">Enter gradient and filling time for each beat. Minimum 5 beats recommended. Empty rows are ignored.</div>
+        <table class="afib-beats-table">
+          <tr><th>Beat</th><th>ΔP (mmHg)</th><th>Fill time (s)</th><th>MVA (cm²)</th></tr>
+          <tr><td>1</td><td><input type="number" id="mva_af_grad_1" step="0.1" oninput="calc()"></td><td><input type="number" id="mva_af_ft_1" step="0.01" oninput="calc()"></td><td class="af-result" id="mva_af_result_1">—</td></tr>
+          <tr><td>2</td><td><input type="number" id="mva_af_grad_2" step="0.1" oninput="calc()"></td><td><input type="number" id="mva_af_ft_2" step="0.01" oninput="calc()"></td><td class="af-result" id="mva_af_result_2">—</td></tr>
+          <tr><td>3</td><td><input type="number" id="mva_af_grad_3" step="0.1" oninput="calc()"></td><td><input type="number" id="mva_af_ft_3" step="0.01" oninput="calc()"></td><td class="af-result" id="mva_af_result_3">—</td></tr>
+          <tr><td>4</td><td><input type="number" id="mva_af_grad_4" step="0.1" oninput="calc()"></td><td><input type="number" id="mva_af_ft_4" step="0.01" oninput="calc()"></td><td class="af-result" id="mva_af_result_4">—</td></tr>
+          <tr><td>5</td><td><input type="number" id="mva_af_grad_5" step="0.1" oninput="calc()"></td><td><input type="number" id="mva_af_ft_5" step="0.01" oninput="calc()"></td><td class="af-result" id="mva_af_result_5">—</td></tr>
+          <tr><td>6</td><td><input type="number" id="mva_af_grad_6" step="0.1" oninput="calc()"></td><td><input type="number" id="mva_af_ft_6" step="0.01" oninput="calc()"></td><td class="af-result" id="mva_af_result_6">—</td></tr>
+          <tr><td>7</td><td><input type="number" id="mva_af_grad_7" step="0.1" oninput="calc()"></td><td><input type="number" id="mva_af_ft_7" step="0.01" oninput="calc()"></td><td class="af-result" id="mva_af_result_7">—</td></tr>
+          <tr><td>8</td><td><input type="number" id="mva_af_grad_8" step="0.1" oninput="calc()"></td><td><input type="number" id="mva_af_ft_8" step="0.01" oninput="calc()"></td><td class="af-result" id="mva_af_result_8">—</td></tr>
+          <tr><td>9</td><td><input type="number" id="mva_af_grad_9" step="0.1" oninput="calc()"></td><td><input type="number" id="mva_af_ft_9" step="0.01" oninput="calc()"></td><td class="af-result" id="mva_af_result_9">—</td></tr>
+          <tr><td>10</td><td><input type="number" id="mva_af_grad_10" step="0.1" oninput="calc()"></td><td><input type="number" id="mva_af_ft_10" step="0.01" oninput="calc()"></td><td class="af-result" id="mva_af_result_10">—</td></tr>
+        </table>
+      </div>
 
     </div>
   </div>
@@ -804,9 +938,9 @@
       <div class="input-row">
         <label>PV O₂</label>
         <select id="pvo2_source" onchange="handlePvO2Source(); calc();">
-          <option value="assume_sa">Assume = SaO₂ (no R→L shunt)</option>
-          <option value="assume_98">Assume 98% (room air)</option>
-          <option value="manual">Enter manually (wedge PA sample)</option>
+          <option value="assume_sa">SaO₂ (assumes no R→L shunt)</option>
+          <option value="assume_98">98% (room air assumption)</option>
+          <option value="manual">Manual entry (wedge PA sample)</option>
         </select>
       </div>
       <div class="input-row" id="pvO2ManualRow" style="display:none;">
@@ -1023,6 +1157,7 @@
           <span class="result-flag" id="f_ava"></span>
         </div>
         <div style="font-size:11px; color:#666; margin:2px 0;" id="ava_math"></div>
+        <div id="avaAfibDetail" class="afib-detail" style="display:none;"></div>
         <table class="vals" style="font-size:7.5pt; margin:4px 0;">
           <tr><th>Severity</th><th>AVA (cm²)</th></tr>
           <tr><td>Normal</td><td>&gt; 2.0</td></tr>
@@ -1043,6 +1178,7 @@
           <span class="result-flag" id="f_mva"></span>
         </div>
         <div style="font-size:11px; color:#666; margin:2px 0;" id="mva_math"></div>
+        <div id="mvaAfibDetail" class="afib-detail" style="display:none;"></div>
         <table class="vals" style="font-size:7.5pt; margin:4px 0;">
           <tr><th>Severity</th><th>MVA (cm²)</th></tr>
           <tr><td>Normal</td><td>4 – 6</td></tr>
@@ -1309,6 +1445,16 @@ function calcDFP() {
   }
 }
 
+// ===================== AFIB TOGGLE =====================
+function toggleAfib() {
+  const isAfib = document.getElementById('afibToggle').checked;
+  document.getElementById('avaSingleInputs').style.display = isAfib ? 'none' : 'block';
+  document.getElementById('mvaSingleInputs').style.display = isAfib ? 'none' : 'block';
+  document.getElementById('avaAfibInputs').style.display = isAfib ? 'block' : 'none';
+  document.getElementById('mvaAfibInputs').style.display = isAfib ? 'block' : 'none';
+  calc();
+}
+
 // ===================== VO2 SOURCE =====================
 function handleVo2Source() {
   const src = document.getElementById('vo2source').value;
@@ -1547,54 +1693,157 @@ function calc() {
   flagCPI('f_cpi', cpi);
 
   // --- Gorlin Valve Areas ---
-  const ava_gradient = v('ava_gradient');
-  const ava_sep = v('ava_sep');
-  const mva_gradient = v('mva_gradient');
-  const mva_dfp = v('mva_dfp');
-
-  let ava = null, mva = null;
+  const isAfib = document.getElementById('afibToggle').checked;
   const gorlinSection = document.getElementById('gorlinResultsSection');
   const avaDiv = document.getElementById('avaResults');
   const mvaDiv = document.getElementById('mvaResults');
   const gorlinCoLabel = document.getElementById('gorlinCoLabel');
-  gorlinCoLabel.textContent = coLabel;
+  const avaAfibDetailEl = document.getElementById('avaAfibDetail');
+  const mvaAfibDetailEl = document.getElementById('mvaAfibDetail');
+  gorlinCoLabel.textContent = isAfib ? coLabel + ' — AFib beat averaging' : coLabel;
 
+  let ava = null, mva = null;
   let showGorlin = false;
 
-  // AVA
-  if (ava_gradient !== null && ava_gradient > 0 && ava_sep !== null && ava_sep > 0 && co !== null && co > 0) {
-    const sqrtG = Math.sqrt(ava_gradient);
-    ava = (co * 1000) / (44.3 * ava_sep * sqrtG);
-    setText('r_ava', fmt(ava));
-    flagAVA('f_ava', ava);
-    document.getElementById('ava_math').textContent =
-      `= (${fmt(co)} × 1000) / (44.3 × ${fmt(ava_sep,1)} × √${fmt(ava_gradient,1)}) = ${fmt(co*1000,0)} / (44.3 × ${fmt(ava_sep,1)} × ${fmt(sqrtG)}) = ${fmt(co*1000,0)} / ${fmt(44.3 * ava_sep * sqrtG,0)} = ${fmt(ava)} cm²`;
-    avaDiv.style.display = 'block';
-    showGorlin = true;
-  } else {
-    setText('r_ava', '—');
-    clearFlag('f_ava');
-    document.getElementById('ava_math').textContent = '';
-    avaDiv.style.display = (ava_gradient !== null || ava_sep !== null) ? 'block' : 'none';
-    if (ava_gradient !== null || ava_sep !== null) showGorlin = true;
-  }
+  if (isAfib) {
+    // --- AFib: per-beat Gorlin ---
+    // AVA per-beat
+    const avaBeats = [];
+    let avaDetailLines = [];
+    let anyAvaInput = false;
+    for (let i = 1; i <= 10; i++) {
+      const grad = v('ava_af_grad_' + i);
+      const et = v('ava_af_et_' + i);
+      const resultEl = document.getElementById('ava_af_result_' + i);
+      if (grad !== null || et !== null) anyAvaInput = true;
+      if (grad !== null && grad > 0 && et !== null && et > 0 && co !== null && co > 0 && hr !== null && hr > 0) {
+        const sep_i = et * hr;
+        const sqrtG = Math.sqrt(grad);
+        const ava_i = (co * 1000) / (44.3 * sep_i * sqrtG);
+        avaBeats.push(ava_i);
+        resultEl.textContent = fmt(ava_i);
+        avaDetailLines.push(`Beat ${i}: ΔP=${fmt(grad,1)}, ET=${fmt(et,2)}s, SEP=${fmt(sep_i,1)}, √ΔP=${fmt(sqrtG)}, AVA=${fmt(ava_i)} cm²`);
+      } else {
+        resultEl.textContent = '—';
+      }
+    }
+    if (avaBeats.length > 0) {
+      ava = avaBeats.reduce((a, b) => a + b, 0) / avaBeats.length;
+      setText('r_ava', fmt(ava));
+      flagAVA('f_ava', ava);
+      document.getElementById('ava_math').textContent =
+        `AFib average of ${avaBeats.length} beats = ${fmt(ava)} cm²`;
+      let detailHtml = avaDetailLines.join('\n');
+      detailHtml += `\n─────────────────────────────────`;
+      detailHtml += `\nAverage AVA (${avaBeats.length} beats) = ${fmt(ava)} cm²`;
+      avaAfibDetailEl.textContent = detailHtml;
+      avaAfibDetailEl.style.display = 'block';
+      if (avaBeats.length < 5) {
+        detailHtml += `\n⚠ Only ${avaBeats.length} beat(s) — minimum 5 recommended in AFib`;
+        avaAfibDetailEl.textContent = detailHtml;
+      }
+      avaDiv.style.display = 'block';
+      showGorlin = true;
+    } else {
+      setText('r_ava', '—');
+      clearFlag('f_ava');
+      document.getElementById('ava_math').textContent = '';
+      avaAfibDetailEl.style.display = 'none';
+      avaDiv.style.display = anyAvaInput ? 'block' : 'none';
+      if (anyAvaInput) showGorlin = true;
+    }
 
-  // MVA
-  if (mva_gradient !== null && mva_gradient > 0 && mva_dfp !== null && mva_dfp > 0 && co !== null && co > 0) {
-    const sqrtG = Math.sqrt(mva_gradient);
-    mva = (co * 1000) / (37.7 * mva_dfp * sqrtG);
-    setText('r_mva', fmt(mva));
-    flagMVA('f_mva', mva);
-    document.getElementById('mva_math').textContent =
-      `= (${fmt(co)} × 1000) / (37.7 × ${fmt(mva_dfp,1)} × √${fmt(mva_gradient,1)}) = ${fmt(co*1000,0)} / (37.7 × ${fmt(mva_dfp,1)} × ${fmt(sqrtG)}) = ${fmt(co*1000,0)} / ${fmt(37.7 * mva_dfp * sqrtG,0)} = ${fmt(mva)} cm²`;
-    mvaDiv.style.display = 'block';
-    showGorlin = true;
+    // MVA per-beat
+    const mvaBeats = [];
+    let mvaDetailLines = [];
+    let anyMvaInput = false;
+    for (let i = 1; i <= 10; i++) {
+      const grad = v('mva_af_grad_' + i);
+      const ft = v('mva_af_ft_' + i);
+      const resultEl = document.getElementById('mva_af_result_' + i);
+      if (grad !== null || ft !== null) anyMvaInput = true;
+      if (grad !== null && grad > 0 && ft !== null && ft > 0 && co !== null && co > 0 && hr !== null && hr > 0) {
+        const dfp_i = ft * hr;
+        const sqrtG = Math.sqrt(grad);
+        const mva_i = (co * 1000) / (37.7 * dfp_i * sqrtG);
+        mvaBeats.push(mva_i);
+        resultEl.textContent = fmt(mva_i);
+        mvaDetailLines.push(`Beat ${i}: ΔP=${fmt(grad,1)}, FT=${fmt(ft,2)}s, DFP=${fmt(dfp_i,1)}, √ΔP=${fmt(sqrtG)}, MVA=${fmt(mva_i)} cm²`);
+      } else {
+        resultEl.textContent = '—';
+      }
+    }
+    if (mvaBeats.length > 0) {
+      mva = mvaBeats.reduce((a, b) => a + b, 0) / mvaBeats.length;
+      setText('r_mva', fmt(mva));
+      flagMVA('f_mva', mva);
+      document.getElementById('mva_math').textContent =
+        `AFib average of ${mvaBeats.length} beats = ${fmt(mva)} cm²`;
+      let detailHtml = mvaDetailLines.join('\n');
+      detailHtml += `\n─────────────────────────────────`;
+      detailHtml += `\nAverage MVA (${mvaBeats.length} beats) = ${fmt(mva)} cm²`;
+      mvaAfibDetailEl.textContent = detailHtml;
+      mvaAfibDetailEl.style.display = 'block';
+      if (mvaBeats.length < 5) {
+        detailHtml += `\n⚠ Only ${mvaBeats.length} beat(s) — minimum 5 recommended in AFib`;
+        mvaAfibDetailEl.textContent = detailHtml;
+      }
+      mvaDiv.style.display = 'block';
+      showGorlin = true;
+    } else {
+      setText('r_mva', '—');
+      clearFlag('f_mva');
+      document.getElementById('mva_math').textContent = '';
+      mvaAfibDetailEl.style.display = 'none';
+      mvaDiv.style.display = anyMvaInput ? 'block' : 'none';
+      if (anyMvaInput) showGorlin = true;
+    }
+
   } else {
-    setText('r_mva', '—');
-    clearFlag('f_mva');
-    document.getElementById('mva_math').textContent = '';
-    mvaDiv.style.display = (mva_gradient !== null || mva_dfp !== null) ? 'block' : 'none';
-    if (mva_gradient !== null || mva_dfp !== null) showGorlin = true;
+    // --- Non-AFib: single-value Gorlin ---
+    avaAfibDetailEl.style.display = 'none';
+    mvaAfibDetailEl.style.display = 'none';
+
+    const ava_gradient = v('ava_gradient');
+    const ava_sep = v('ava_sep');
+    const mva_gradient = v('mva_gradient');
+    const mva_dfp = v('mva_dfp');
+
+    // AVA
+    if (ava_gradient !== null && ava_gradient > 0 && ava_sep !== null && ava_sep > 0 && co !== null && co > 0) {
+      const sqrtG = Math.sqrt(ava_gradient);
+      ava = (co * 1000) / (44.3 * ava_sep * sqrtG);
+      setText('r_ava', fmt(ava));
+      flagAVA('f_ava', ava);
+      document.getElementById('ava_math').textContent =
+        `= (${fmt(co)} × 1000) / (44.3 × ${fmt(ava_sep,1)} × √${fmt(ava_gradient,1)}) = ${fmt(co*1000,0)} / (44.3 × ${fmt(ava_sep,1)} × ${fmt(sqrtG)}) = ${fmt(co*1000,0)} / ${fmt(44.3 * ava_sep * sqrtG,0)} = ${fmt(ava)} cm²`;
+      avaDiv.style.display = 'block';
+      showGorlin = true;
+    } else {
+      setText('r_ava', '—');
+      clearFlag('f_ava');
+      document.getElementById('ava_math').textContent = '';
+      avaDiv.style.display = (ava_gradient !== null || ava_sep !== null) ? 'block' : 'none';
+      if (ava_gradient !== null || ava_sep !== null) showGorlin = true;
+    }
+
+    // MVA
+    if (mva_gradient !== null && mva_gradient > 0 && mva_dfp !== null && mva_dfp > 0 && co !== null && co > 0) {
+      const sqrtG = Math.sqrt(mva_gradient);
+      mva = (co * 1000) / (37.7 * mva_dfp * sqrtG);
+      setText('r_mva', fmt(mva));
+      flagMVA('f_mva', mva);
+      document.getElementById('mva_math').textContent =
+        `= (${fmt(co)} × 1000) / (37.7 × ${fmt(mva_dfp,1)} × √${fmt(mva_gradient,1)}) = ${fmt(co*1000,0)} / (37.7 × ${fmt(mva_dfp,1)} × ${fmt(sqrtG)}) = ${fmt(co*1000,0)} / ${fmt(37.7 * mva_dfp * sqrtG,0)} = ${fmt(mva)} cm²`;
+      mvaDiv.style.display = 'block';
+      showGorlin = true;
+    } else {
+      setText('r_mva', '—');
+      clearFlag('f_mva');
+      document.getElementById('mva_math').textContent = '';
+      mvaDiv.style.display = (mva_gradient !== null || mva_dfp !== null) ? 'block' : 'none';
+      if (mva_gradient !== null || mva_dfp !== null) showGorlin = true;
+    }
   }
 
   gorlinSection.style.display = showGorlin ? 'block' : 'none';
@@ -1607,6 +1856,10 @@ function calc() {
 
 
   // --- Copy text ---
+  const _ava_gradient = isAfib ? null : v('ava_gradient');
+  const _ava_sep = isAfib ? null : v('ava_sep');
+  const _mva_gradient = isAfib ? null : v('mva_gradient');
+  const _mva_dfp = isAfib ? null : v('mva_dfp');
   buildCopyText(bsa, hb, hr, o2k, useDissolved,
     ra_a, ra_v, ra_mean, rv_sys, rv_dia, rv_edp,
     pa_sys, pa_dia, pa_mean, pcwp_a, pcwp_v, pcwp_mean,
@@ -1614,7 +1867,7 @@ function calc() {
     cao2, cvo2, avo2, vo2, fickCO, fickCI, sv, svi,
     td_co, tdCI, tpg, dpg, pvr, pvrDyn, pvri, svr, svrDyn, svri,
     papi, rvswi, cpo, cpi, useFick,
-    ava, mva, ava_gradient, ava_sep, mva_gradient, mva_dfp);
+    ava, mva, _ava_gradient, _ava_sep, _mva_gradient, _mva_dfp, isAfib);
 
   if (currentTab === 'shunt') {
     calcShunt();
@@ -2091,15 +2344,6 @@ function buildShuntCopyText(d) {
     t += `  PVR/SVR ratio = ${n(pvr_svr_ratio,2)}${pvr_svr_ratio > 0.67 ? ' — EISENMENGER CONCERN' : ''}\n`;
   }
 
-  // Append interpretation from the rendered interpretation section
-  const interpEl = document.getElementById('shuntInterpretation');
-  if (interpEl && interpEl.textContent.trim() && !interpEl.textContent.includes('Enter oximetry data')) {
-    t += '\nINTERPRETATION\n';
-    interpEl.querySelectorAll('.info-box, .warning-box, .error-box').forEach(box => {
-      t += `- ${box.textContent.trim()}\n`;
-    });
-  }
-
   if (document.getElementById('shuntPlainTextToggle').checked) {
     t = toPlainText(t);
   }
@@ -2172,7 +2416,7 @@ function buildCopyText(bsa, hb, hr, o2k, useDissolved,
   cao2, cvo2, avo2, vo2, fickCO, fickCI, sv, svi,
   td_co, tdCI, tpg, dpg, pvr, pvrDyn, pvri, svr, svrDyn, svri,
   papi, rvswi, cpo, cpi, useFick,
-  ava, mva, ava_gradient, ava_sep, mva_gradient, mva_dfp) {
+  ava, mva, ava_gradient, ava_sep, mva_gradient, mva_dfp, isAfib) {
 
   const vo2src = document.getElementById('vo2source');
   const vo2label = vo2src.options[vo2src.selectedIndex].text;
@@ -2273,10 +2517,33 @@ function buildCopyText(bsa, hb, hr, o2k, useDissolved,
   const coUsedStr = useFick ? n(fickCO) : n(td_co);
 
   if (ava !== null || mva !== null) {
-    t += `\nGORLIN VALVE AREA CALCULATIONS (using ${coMethod}: ${coUsedStr} L/min)\n`;
+    const afibNote = isAfib ? ' — AFib beat-by-beat averaging' : '';
+    t += `\nGORLIN VALVE AREA CALCULATIONS (using ${coMethod}: ${coUsedStr} L/min${afibNote})\n`;
   }
 
-  if (ava !== null && ava_gradient !== null && ava_sep !== null) {
+  if (isAfib && ava !== null) {
+    // AFib AVA: per-beat tabular data
+    t += `\nAortic Valve Area (AVA) — AFib per-beat method:\n`;
+    t += `  CO: ${coUsedStr} L/min, HR: ${n(hr,0)} bpm\n`;
+    t += `  Beat  ΔP(mmHg)  ET(s)    SEP      √ΔP     AVA(cm²)\n`;
+    const avaBeats = [];
+    for (let i = 1; i <= 10; i++) {
+      const grad = v('ava_af_grad_' + i);
+      const et = v('ava_af_et_' + i);
+      if (grad !== null && grad > 0 && et !== null && et > 0 && coUsed > 0 && hr > 0) {
+        const sep_i = et * hr;
+        const sqrtG = Math.sqrt(grad);
+        const ava_i = (coUsed * 1000) / (44.3 * sep_i * sqrtG);
+        avaBeats.push(ava_i);
+        const pad = (s, w) => s.toString().padStart(w);
+        t += `  ${pad(i,4)}  ${pad(n(grad,1),8)}  ${pad(n(et,2),5)}  ${pad(n(sep_i,1),7)}  ${pad(n(sqrtG),7)}  ${pad(n(ava_i),8)}\n`;
+      }
+    }
+    t += `  ──────────────────────────────────────────────────\n`;
+    t += `  Average AVA (${avaBeats.length} beats) = ${n(ava)} cm²\n`;
+    if (avaBeats.length < 5) t += `  ⚠ Only ${avaBeats.length} beat(s) — minimum 5 recommended in AFib\n`;
+    t += `  Interpretation: ${avaLabel(ava)}\n`;
+  } else if (!isAfib && ava !== null && ava_gradient !== null && ava_sep !== null) {
     const sqrtG = Math.sqrt(ava_gradient);
     const denom = 44.3 * ava_sep * sqrtG;
     const ejTime = v('ava_ejtime');
@@ -2296,7 +2563,29 @@ function buildCopyText(bsa, hb, hr, o2k, useDissolved,
     t += `  Interpretation: ${avaLabel(ava)}\n`;
   }
 
-  if (mva !== null && mva_gradient !== null && mva_dfp !== null) {
+  if (isAfib && mva !== null) {
+    // AFib MVA: per-beat tabular data
+    t += `\nMitral Valve Area (MVA) — AFib per-beat method:\n`;
+    t += `  CO: ${coUsedStr} L/min, HR: ${n(hr,0)} bpm\n`;
+    t += `  Beat  ΔP(mmHg)  FT(s)    DFP      √ΔP     MVA(cm²)\n`;
+    const mvaBeats = [];
+    for (let i = 1; i <= 10; i++) {
+      const grad = v('mva_af_grad_' + i);
+      const ft = v('mva_af_ft_' + i);
+      if (grad !== null && grad > 0 && ft !== null && ft > 0 && coUsed > 0 && hr > 0) {
+        const dfp_i = ft * hr;
+        const sqrtG = Math.sqrt(grad);
+        const mva_i = (coUsed * 1000) / (37.7 * dfp_i * sqrtG);
+        mvaBeats.push(mva_i);
+        const pad = (s, w) => s.toString().padStart(w);
+        t += `  ${pad(i,4)}  ${pad(n(grad,1),8)}  ${pad(n(ft,2),5)}  ${pad(n(dfp_i,1),7)}  ${pad(n(sqrtG),7)}  ${pad(n(mva_i),8)}\n`;
+      }
+    }
+    t += `  ──────────────────────────────────────────────────\n`;
+    t += `  Average MVA (${mvaBeats.length} beats) = ${n(mva)} cm²\n`;
+    if (mvaBeats.length < 5) t += `  ⚠ Only ${mvaBeats.length} beat(s) — minimum 5 recommended in AFib\n`;
+    t += `  Interpretation: ${mvaLabel(mva)}\n`;
+  } else if (!isAfib && mva !== null && mva_gradient !== null && mva_dfp !== null) {
     const sqrtG = Math.sqrt(mva_gradient);
     const denom = 37.7 * mva_dfp * sqrtG;
     const fillTime = v('mva_filltime');
@@ -2314,15 +2603,6 @@ function buildCopyText(bsa, hb, hr, o2k, useDissolved,
     t += `      = ${n(coUsed * 1000, 0)} / ${n(denom, 0)}\n`;
     t += `      = ${n(mva)} cm²\n`;
     t += `  Interpretation: ${mvaLabel(mva)}\n`;
-  }
-
-  // Append interpretation from the rendered interpretation section
-  const interpEl = document.getElementById('rhcInterpretation');
-  if (interpEl && interpEl.textContent.trim() && !interpEl.textContent.includes('Enter hemodynamic data')) {
-    t += '\nINTERPRETATION\n';
-    interpEl.querySelectorAll('.info-box, .warning-box, .error-box').forEach(box => {
-      t += `- ${box.textContent.trim()}\n`;
-    });
   }
 
   if (document.getElementById('plainTextToggle').checked) {
@@ -2431,6 +2711,9 @@ function clearAll() {
   document.getElementById('pvo2_source').value = 'assume_sa';
   document.getElementById('pvO2ManualRow').style.display = 'none';
   document.getElementById('shuntPlainTextToggle').checked = false;
+  // Reset AFib toggle
+  document.getElementById('afibToggle').checked = false;
+  toggleAfib();
   handleVo2Source();
   calc();
 }
@@ -2570,6 +2853,11 @@ function buildRhcInterpretation(ci, fickCI, tdCI, useFick, ra_mean, pcwp_mean, p
     let mva_sev = mva < 1.0 ? 'severe mitral stenosis' : mva <= 1.5 ? 'moderate mitral stenosis' : mva <= 4.0 ? 'mild mitral stenosis' : 'normal mitral valve area';
     const mva_type = mva < 1.0 ? 'error' : mva <= 1.5 ? 'warn' : 'info';
     bullets.push({type: mva_type, text:`MVA ${mva.toFixed(2)} cm\xB2 \u2014 ${mva_sev}.`});
+  }
+
+  // 10. AFib note
+  if (document.getElementById('afibToggle').checked && (ava !== null || mva !== null)) {
+    bullets.push({type:'info', text:'Gorlin valve areas computed by beat-to-beat averaging (AFib method).'});
   }
 
   if (bullets.length === 0) {
