@@ -397,31 +397,6 @@
   body.dark table.vals td { border-bottom-color: #2e323c; }
   body.dark table.vals tr.severe td { color: #ef5350; }
 
-  /* SVG DIAGRAM */
-  .svg-chamber { fill: #ffffff; stroke: #b0bec5; stroke-width: 1.5; rx: 8; }
-  .svg-chamber-right { fill: #e3f2fd; stroke: #1565c0; stroke-width: 1.5; }
-  .svg-chamber-left { fill: #fff3e0; stroke: #e65100; stroke-width: 1.5; }
-  .svg-chamber-vessel { fill: #e8f5e9; stroke: #2e7d32; stroke-width: 1.5; }
-  .svg-label { fill: #546e7a; font-size: 10px; font-weight: 700; font-family: -apple-system, Helvetica, Arial, sans-serif; }
-  .svg-value { fill: #1a1a1a; font-size: 12px; font-weight: 700; font-family: "SF Mono", "Menlo", monospace; }
-  .svg-value-sub { fill: #555; font-size: 9px; font-family: -apple-system, Helvetica, Arial, sans-serif; }
-  .svg-arrow { stroke: #607d8b; stroke-width: 1.5; fill: none; }
-  .svg-arrow-fill { fill: #607d8b; }
-  .svg-stepup { stroke: #c62828; fill: none; stroke-width: 2; }
-  .svg-stepup-fill { fill: #c62828; }
-  .svg-flow-label { fill: #37474f; font-size: 9px; font-family: -apple-system, Helvetica, Arial, sans-serif; font-style: italic; }
-  body.dark .svg-chamber { fill: #2a2e37; stroke: #4a5568; }
-  body.dark .svg-chamber-right { fill: #1a2a3a; stroke: #4a90d9; }
-  body.dark .svg-chamber-left { fill: #2a2a1a; stroke: #ffa726; }
-  body.dark .svg-chamber-vessel { fill: #1a2a1a; stroke: #66bb6a; }
-  body.dark .svg-label { fill: #b0b8c4; }
-  body.dark .svg-value { fill: #d8dce4; }
-  body.dark .svg-value-sub { fill: #9098a8; }
-  body.dark .svg-arrow { stroke: #6a7080; }
-  body.dark .svg-arrow-fill { fill: #6a7080; }
-  body.dark .svg-stepup { stroke: #ef5350; }
-  body.dark .svg-stepup-fill { fill: #ef5350; }
-  body.dark .svg-flow-label { fill: #9098a8; }
 </style>
 </head>
 <body>
@@ -858,102 +833,6 @@
 
 <div id="rhcResults">
 
-  <!-- HEMODYNAMIC DIAGRAM -->
-  <div class="section">
-    <div class="section-head" style="cursor:pointer;" onclick="toggleDiagram('rhcDiagram')">
-      Hemodynamic Diagram <span style="float:right; font-weight:400; font-size:11px;" id="rhcDiagramToggle">&#9654; Show</span>
-    </div>
-    <div class="section-body" id="rhcDiagram" style="display:none; padding:12px; text-align:center;">
-      <svg id="rhcSvg" viewBox="0 0 460 280" width="100%" style="max-width:460px; display:block; margin:0 auto;">
-        <!-- Background -->
-        <rect x="0" y="0" width="460" height="280" fill="transparent"/>
-
-        <!-- Flow labels -->
-        <text x="230" y="14" text-anchor="middle" class="svg-flow-label">Right Heart Circulation — Live Values</text>
-
-        <!-- RA box -->
-        <rect x="10" y="30" width="80" height="70" rx="8" class="svg-chamber-right"/>
-        <text x="50" y="46" text-anchor="middle" class="svg-label">RA</text>
-        <text x="50" y="64" text-anchor="middle" class="svg-value" id="svg_ra_text">—</text>
-        <text x="50" y="78" text-anchor="middle" class="svg-value-sub">mmHg</text>
-        <text x="50" y="92" text-anchor="middle" class="svg-value-sub" id="svg_ra_sub">mean</text>
-
-        <!-- RV box -->
-        <rect x="130" y="30" width="80" height="70" rx="8" class="svg-chamber-right"/>
-        <text x="170" y="46" text-anchor="middle" class="svg-label">RV</text>
-        <text x="170" y="64" text-anchor="middle" class="svg-value" id="svg_rv_text">—</text>
-        <text x="170" y="78" text-anchor="middle" class="svg-value-sub">mmHg</text>
-        <text x="170" y="92" text-anchor="middle" class="svg-value-sub">sys/dia</text>
-
-        <!-- PA box -->
-        <rect x="260" y="30" width="90" height="70" rx="8" class="svg-chamber-right"/>
-        <text x="305" y="46" text-anchor="middle" class="svg-label">PA</text>
-        <text x="305" y="64" text-anchor="middle" class="svg-value" id="svg_pa_text">—</text>
-        <text x="305" y="78" text-anchor="middle" class="svg-value-sub">mmHg</text>
-        <text x="305" y="92" text-anchor="middle" class="svg-value-sub" id="svg_pa_sub">sys/dia mean</text>
-
-        <!-- PCWP / LA box -->
-        <rect x="370" y="110" width="80" height="70" rx="8" class="svg-chamber-left"/>
-        <text x="410" y="126" text-anchor="middle" class="svg-label">PCWP</text>
-        <text x="410" y="144" text-anchor="middle" class="svg-value" id="svg_pcwp_text">—</text>
-        <text x="410" y="158" text-anchor="middle" class="svg-value-sub">mmHg</text>
-        <text x="410" y="172" text-anchor="middle" class="svg-value-sub">mean</text>
-
-        <!-- AO box -->
-        <rect x="170" y="190" width="80" height="70" rx="8" class="svg-chamber-left"/>
-        <text x="210" y="206" text-anchor="middle" class="svg-label">Aorta</text>
-        <text x="210" y="224" text-anchor="middle" class="svg-value" id="svg_ao_text">—</text>
-        <text x="210" y="238" text-anchor="middle" class="svg-value-sub">mmHg</text>
-        <text x="210" y="252" text-anchor="middle" class="svg-value-sub">sys/dia</text>
-
-        <!-- Lungs box -->
-        <rect x="355" y="30" width="95" height="55" rx="8" class="svg-chamber-vessel" style="fill:#e8f5e9; stroke:#2e7d32;"/>
-        <text x="403" y="52" text-anchor="middle" class="svg-label" style="fill:#2e7d32;">LUNGS</text>
-        <text x="403" y="70" text-anchor="middle" class="svg-value-sub" style="fill:#2e7d32;">Gas exchange</text>
-
-        <!-- Arrows: RA → RV -->
-        <line x1="90" y1="65" x2="128" y2="65" class="svg-arrow"/>
-        <polygon points="128,61 136,65 128,69" class="svg-arrow-fill"/>
-
-        <!-- Arrows: RV → PA -->
-        <line x1="210" y1="65" x2="258" y2="65" class="svg-arrow"/>
-        <polygon points="258,61 266,65 258,69" class="svg-arrow-fill"/>
-
-        <!-- Arrow: PA → Lungs -->
-        <line x1="350" y1="65" x2="357" y2="65" class="svg-arrow"/>
-        <polygon points="357,61 365,65 357,69" class="svg-arrow-fill"/>
-
-        <!-- Arrow: Lungs → PCWP (down) -->
-        <line x1="403" y1="85" x2="403" y2="108" class="svg-arrow"/>
-        <polygon points="399,108 403,116 407,108" class="svg-arrow-fill"/>
-
-        <!-- Arrow: PCWP → AO (left and down) -->
-        <line x1="370" y1="145" x2="280" y2="225" class="svg-arrow"/>
-        <polygon points="276,218 278,228 286,222" class="svg-arrow-fill"/>
-        <text x="335" y="178" text-anchor="middle" class="svg-flow-label">Pulm veins/LA/LV</text>
-
-        <!-- Arrow: AO → Body (left) -->
-        <line x1="170" y1="225" x2="90" y2="225" class="svg-arrow"/>
-        <polygon points="90,221 82,225 90,229" class="svg-arrow-fill"/>
-        <text x="130" y="215" text-anchor="middle" class="svg-flow-label">Body</text>
-
-        <!-- Arrow: Body → RA (up) -->
-        <line x1="50" y1="215" x2="50" y2="103" class="svg-arrow"/>
-        <polygon points="46,103 50,95 54,103" class="svg-arrow-fill"/>
-        <text x="30" y="162" text-anchor="middle" class="svg-flow-label" transform="rotate(-90,30,162)">Venous return</text>
-
-        <!-- CO annotation on RA→RV arrow -->
-        <text x="109" y="58" text-anchor="middle" class="svg-flow-label" id="svg_co_text">CO: —</text>
-
-        <!-- PVR annotation -->
-        <text x="232" y="48" text-anchor="middle" class="svg-flow-label" id="svg_pvr_text">PVR: —</text>
-
-        <!-- SVR annotation -->
-        <text x="130" y="240" text-anchor="middle" class="svg-flow-label" id="svg_svr_text">SVR: —</text>
-      </svg>
-    </div>
-  </div>
-
   <!-- O2 CONTENT -->
   <div class="section">
     <div class="section-head">O₂ Content</div>
@@ -1215,94 +1094,6 @@
 
 <!-- ==================== SHUNT RESULTS ==================== -->
 <div id="shuntResults" style="display:none;">
-
-  <!-- SHUNT DIAGRAM -->
-  <div class="section">
-    <div class="section-head" style="cursor:pointer;" onclick="toggleDiagram('shuntDiagram')">
-      Oximetry Run Diagram <span style="float:right; font-weight:400; font-size:11px;" id="shuntDiagramToggle">&#9654; Show</span>
-    </div>
-    <div class="section-body" id="shuntDiagram" style="display:none; padding:12px; text-align:center;">
-      <svg id="shuntSvg" viewBox="0 0 460 340" width="100%" style="max-width:460px; display:block; margin:0 auto;">
-        <!-- Background label -->
-        <text x="230" y="14" text-anchor="middle" class="svg-flow-label">Oximetry Run — O&#x2082; Saturations at Each Level</text>
-
-        <!-- SVC box -->
-        <rect x="60" y="22" width="75" height="60" rx="8" class="svg-chamber-vessel"/>
-        <text x="97" y="38" text-anchor="middle" class="svg-label">SVC</text>
-        <text x="97" y="56" text-anchor="middle" class="svg-value" id="svg_svc_sat">—</text>
-        <text x="97" y="70" text-anchor="middle" class="svg-value-sub">%</text>
-
-        <!-- IVC box -->
-        <rect x="60" y="110" width="75" height="60" rx="8" class="svg-chamber-vessel"/>
-        <text x="97" y="126" text-anchor="middle" class="svg-label">IVC</text>
-        <text x="97" y="144" text-anchor="middle" class="svg-value" id="svg_ivc_sat">—</text>
-        <text x="97" y="158" text-anchor="middle" class="svg-value-sub">%</text>
-
-        <!-- RA box -->
-        <rect x="175" y="60" width="80" height="65" rx="8" class="svg-chamber-right"/>
-        <text x="215" y="76" text-anchor="middle" class="svg-label">RA</text>
-        <text x="215" y="96" text-anchor="middle" class="svg-value" id="svg_ra_sat">—</text>
-        <text x="215" y="110" text-anchor="middle" class="svg-value-sub">%</text>
-        <text x="215" y="122" text-anchor="middle" class="svg-value-sub">step-up &gt;7% = ASD</text>
-
-        <!-- RV box -->
-        <rect x="175" y="160" width="80" height="65" rx="8" class="svg-chamber-right"/>
-        <text x="215" y="176" text-anchor="middle" class="svg-label">RV</text>
-        <text x="215" y="196" text-anchor="middle" class="svg-value" id="svg_rv_sat">—</text>
-        <text x="215" y="210" text-anchor="middle" class="svg-value-sub">%</text>
-        <text x="215" y="222" text-anchor="middle" class="svg-value-sub">step-up &gt;5% = VSD</text>
-
-        <!-- PA box -->
-        <rect x="175" y="258" width="80" height="65" rx="8" class="svg-chamber-right"/>
-        <text x="215" y="274" text-anchor="middle" class="svg-label">PA</text>
-        <text x="215" y="294" text-anchor="middle" class="svg-value" id="svg_pa_sat">—</text>
-        <text x="215" y="308" text-anchor="middle" class="svg-value-sub">%</text>
-        <text x="215" y="320" text-anchor="middle" class="svg-value-sub">step-up &gt;5% = PDA</text>
-
-        <!-- MVO2 annotation box -->
-        <rect x="320" y="60" width="130" height="55" rx="8" class="svg-chamber"/>
-        <text x="385" y="76" text-anchor="middle" class="svg-label">Mixed Venous O&#x2082;</text>
-        <text x="385" y="96" text-anchor="middle" class="svg-value" id="svg_mvo2_text">—</text>
-        <text x="385" y="108" text-anchor="middle" class="svg-value-sub">% (Flamm formula)</text>
-
-        <!-- Qp/Qs annotation box -->
-        <rect x="320" y="140" width="130" height="55" rx="8" class="svg-chamber"/>
-        <text x="385" y="156" text-anchor="middle" class="svg-label">Qp/Qs</text>
-        <text x="385" y="176" text-anchor="middle" class="svg-value" id="svg_qpqs_text">—</text>
-        <text x="385" y="188" text-anchor="middle" class="svg-value-sub">(shunt ratio)</text>
-
-        <!-- Arrows: SVC → RA -->
-        <line x1="135" y1="52" x2="173" y2="82" class="svg-arrow"/>
-        <polygon points="169,78 177,84 171,90" class="svg-arrow-fill"/>
-
-        <!-- Arrows: IVC → RA -->
-        <line x1="135" y1="140" x2="173" y2="110" class="svg-arrow"/>
-        <polygon points="169,104 177,112 171,118" class="svg-arrow-fill"/>
-
-        <!-- Arrow: RA → RV -->
-        <line x1="215" y1="125" x2="215" y2="158" class="svg-arrow"/>
-        <polygon points="211,158 215,166 219,158" class="svg-arrow-fill"/>
-
-        <!-- Arrow: RV → PA -->
-        <line x1="215" y1="225" x2="215" y2="256" class="svg-arrow"/>
-        <polygon points="211,256 215,264 219,256" class="svg-arrow-fill"/>
-
-        <!-- Step-up markers (hidden by default, shown by JS) -->
-        <g id="svg_stepup_atrial" style="display:none;">
-          <line x1="260" y1="52" x2="260" y2="110" class="svg-stepup" stroke-dasharray="4,3"/>
-          <text x="268" y="86" class="svg-flow-label" style="fill:#c62828; font-weight:700;">&#x25B2; Atrial step-up!</text>
-        </g>
-        <g id="svg_stepup_ventricular" style="display:none;">
-          <line x1="260" y1="145" x2="260" y2="195" class="svg-stepup" stroke-dasharray="4,3"/>
-          <text x="268" y="175" class="svg-flow-label" style="fill:#c62828; font-weight:700;">&#x25B2; Ventricular step-up!</text>
-        </g>
-        <g id="svg_stepup_gv" style="display:none;">
-          <line x1="260" y1="245" x2="260" y2="290" class="svg-stepup" stroke-dasharray="4,3"/>
-          <text x="268" y="272" class="svg-flow-label" style="fill:#c62828; font-weight:700;">&#x25B2; GV step-up!</text>
-        </g>
-      </svg>
-    </div>
-  </div>
 
   <!-- MIXED VENOUS O2 -->
   <div class="section">
@@ -1814,8 +1605,6 @@ function calc() {
   // --- Interpretation ---
   buildRhcInterpretation(ci, fickCI, tdCI, useFick, ra_mean, pcwp_mean, pa_mean, pvr, papi, rvswi, cpo, cpi, avo2, fickCO, td_co, ava, mva);
 
-  // --- Diagram ---
-  updateRhcDiagram(ra_mean, rv_sys, rv_dia, pa_sys, pa_dia, pa_mean, pcwp_mean, ao_sys, ao_dia, co, pvr, svr);
 
   // --- Copy text ---
   buildCopyText(bsa, hb, hr, o2k, useDissolved,
@@ -2146,8 +1935,6 @@ function calcShunt() {
   // --- Shunt Interpretation ---
   buildShuntInterpretation(svc_ref, pa_sat, ra_mean_sat, rv_mean_sat, qpqs, qp, qs, qeff, lr_shunt, rl_shunt, pvr_shunt, svr_shunt, pvr_svr_ratio);
 
-  // --- Shunt Diagram ---
-  updateShuntDiagram(svc_high, ivc_sat, ra_mean_sat, rv_mean_sat, pa_sat, mvo2, qpqs, svc_ref);
 
   // --- Shunt Copy Text ---
   buildShuntCopyText({
@@ -2302,6 +2089,15 @@ function buildShuntCopyText(d) {
   }
   if (pvr_svr_ratio !== null) {
     t += `  PVR/SVR ratio = ${n(pvr_svr_ratio,2)}${pvr_svr_ratio > 0.67 ? ' — EISENMENGER CONCERN' : ''}\n`;
+  }
+
+  // Append interpretation from the rendered interpretation section
+  const interpEl = document.getElementById('shuntInterpretation');
+  if (interpEl && interpEl.textContent.trim() && !interpEl.textContent.includes('Enter oximetry data')) {
+    t += '\nINTERPRETATION\n';
+    interpEl.querySelectorAll('.info-box, .warning-box, .error-box').forEach(box => {
+      t += `- ${box.textContent.trim()}\n`;
+    });
   }
 
   if (document.getElementById('shuntPlainTextToggle').checked) {
@@ -2520,6 +2316,15 @@ function buildCopyText(bsa, hb, hr, o2k, useDissolved,
     t += `  Interpretation: ${mvaLabel(mva)}\n`;
   }
 
+  // Append interpretation from the rendered interpretation section
+  const interpEl = document.getElementById('rhcInterpretation');
+  if (interpEl && interpEl.textContent.trim() && !interpEl.textContent.includes('Enter hemodynamic data')) {
+    t += '\nINTERPRETATION\n';
+    interpEl.querySelectorAll('.info-box, .warning-box, .error-box').forEach(box => {
+      t += `- ${box.textContent.trim()}\n`;
+    });
+  }
+
   if (document.getElementById('plainTextToggle').checked) {
     t = toPlainText(t);
   }
@@ -2645,19 +2450,6 @@ try {
     document.getElementById('darkToggle').textContent = 'Light Mode';
   }
 } catch(e) {}
-
-// ===================== TOGGLE DIAGRAM =====================
-function toggleDiagram(id) {
-  const el = document.getElementById(id);
-  const toggle = document.getElementById(id + 'Toggle');
-  if (el.style.display === 'none') {
-    el.style.display = 'block';
-    toggle.textContent = '\u25BC Hide';
-  } else {
-    el.style.display = 'none';
-    toggle.textContent = '\u25B6 Show';
-  }
-}
 
 // ===================== RHC INTERPRETATION =====================
 function buildRhcInterpretation(ci, fickCI, tdCI, useFick, ra_mean, pcwp_mean, pa_mean, pvr, papi, rvswi, cpo, cpi, avo2, fickCO, td_co, ava, mva) {
@@ -2791,74 +2583,6 @@ function buildRhcInterpretation(ci, fickCI, tdCI, useFick, ra_mean, pcwp_mean, p
   }).join('');
 }
 
-// ===================== RHC DIAGRAM UPDATE =====================
-function updateRhcDiagram(ra_mean, rv_sys, rv_dia, pa_sys, pa_dia, pa_mean, pcwp_mean, ao_sys, ao_dia, co, pvr, svr) {
-  const n = (val, dec) => (val !== null && val !== undefined && !isNaN(val) && isFinite(val)) ? val.toFixed(dec === undefined ? 0 : dec) : '\u2014';
-
-  // RA
-  document.getElementById('svg_ra_text').textContent = ra_mean !== null ? n(ra_mean) : '\u2014';
-  document.getElementById('svg_ra_sub').textContent = ra_mean !== null ? 'mean ' + n(ra_mean) + ' mmHg' : 'mean';
-
-  // RV
-  if (rv_sys !== null || rv_dia !== null) {
-    document.getElementById('svg_rv_text').textContent = n(rv_sys) + '/' + n(rv_dia);
-  } else {
-    document.getElementById('svg_rv_text').textContent = '\u2014';
-  }
-
-  // PA
-  if (pa_sys !== null || pa_dia !== null || pa_mean !== null) {
-    document.getElementById('svg_pa_text').textContent = n(pa_sys) + '/' + n(pa_dia);
-    document.getElementById('svg_pa_sub').textContent = 'mean ' + n(pa_mean);
-  } else {
-    document.getElementById('svg_pa_text').textContent = '\u2014';
-    document.getElementById('svg_pa_sub').textContent = 'sys/dia mean';
-  }
-
-  // PCWP
-  document.getElementById('svg_pcwp_text').textContent = pcwp_mean !== null ? n(pcwp_mean) : '\u2014';
-
-  // Aorta
-  if (ao_sys !== null || ao_dia !== null) {
-    document.getElementById('svg_ao_text').textContent = n(ao_sys) + '/' + n(ao_dia);
-  } else {
-    document.getElementById('svg_ao_text').textContent = '\u2014';
-  }
-
-  // CO
-  document.getElementById('svg_co_text').textContent = co !== null ? 'CO: ' + n(co, 2) + ' L/min' : 'CO: \u2014';
-
-  // PVR
-  document.getElementById('svg_pvr_text').textContent = pvr !== null ? 'PVR: ' + n(pvr, 2) + ' WU' : 'PVR: \u2014';
-
-  // SVR
-  document.getElementById('svg_svr_text').textContent = svr !== null ? 'SVR: ' + n(svr, 2) + ' WU' : 'SVR: \u2014';
-
-  // Color-code RA
-  const raRect = document.querySelector('#rhcSvg rect:nth-of-type(2)');
-  // Color coding via inline stroke updates
-  const svgEl = document.getElementById('rhcSvg');
-  const rects = svgEl.querySelectorAll('rect[rx="8"]');
-  // RA rect (index 0)
-  if (rects[0]) {
-    if (ra_mean !== null && ra_mean > 7) rects[0].style.stroke = '#c62828';
-    else if (ra_mean !== null) rects[0].style.stroke = '#1565c0';
-    else rects[0].style.stroke = '';
-  }
-  // PA rect (index 2)
-  if (rects[2]) {
-    if (pa_mean !== null && pa_mean > 20) rects[2].style.stroke = '#c62828';
-    else if (pa_mean !== null) rects[2].style.stroke = '#1565c0';
-    else rects[2].style.stroke = '';
-  }
-  // PCWP rect (index 3)
-  if (rects[3]) {
-    if (pcwp_mean !== null && pcwp_mean > 12) rects[3].style.stroke = '#c62828';
-    else if (pcwp_mean !== null) rects[3].style.stroke = '#e65100';
-    else rects[3].style.stroke = '';
-  }
-}
-
 // ===================== SHUNT INTERPRETATION =====================
 function buildShuntInterpretation(svc_ref, pa_sat, ra_mean_sat, rv_mean_sat, qpqs, qp, qs, qeff, lr_shunt, rl_shunt, pvr_shunt, svr_shunt, pvr_svr_ratio) {
   const el = document.getElementById('shuntInterpretation');
@@ -2967,32 +2691,6 @@ function buildShuntInterpretation(svc_ref, pa_sat, ra_mean_sat, rv_mean_sat, qpq
     if (b.type === 'warn') return `<div class="warning-box">${b.text}</div>`;
     return `<div class="info-box">${b.text}</div>`;
   }).join('');
-}
-
-// ===================== SHUNT DIAGRAM UPDATE =====================
-function updateShuntDiagram(svc_high, ivc_sat, ra_mean_sat, rv_mean_sat, pa_sat, mvo2, qpqs, svc_ref) {
-  const n = (val, dec) => (val !== null && val !== undefined && !isNaN(val) && isFinite(val)) ? val.toFixed(dec === undefined ? 1 : dec) : '\u2014';
-
-  document.getElementById('svg_svc_sat').textContent = svc_high !== null ? n(svc_high) + '%' : '\u2014';
-  document.getElementById('svg_ivc_sat').textContent = ivc_sat !== null ? n(ivc_sat) + '%' : '\u2014';
-  document.getElementById('svg_ra_sat').textContent = ra_mean_sat !== null ? n(ra_mean_sat) + '%' : '\u2014';
-  document.getElementById('svg_rv_sat').textContent = rv_mean_sat !== null ? n(rv_mean_sat) + '%' : '\u2014';
-  document.getElementById('svg_pa_sat').textContent = pa_sat !== null ? n(pa_sat) + '%' : '\u2014';
-  document.getElementById('svg_mvo2_text').textContent = mvo2 !== null ? n(mvo2) + '%' : '\u2014';
-  document.getElementById('svg_qpqs_text').textContent = qpqs !== null ? n(qpqs, 2) : '\u2014';
-
-  // Show/hide step-up markers
-  const atrialSU = (svc_ref !== null && ra_mean_sat !== null) ? ra_mean_sat - svc_ref : null;
-  const ventSU = (ra_mean_sat !== null && rv_mean_sat !== null) ? rv_mean_sat - ra_mean_sat : null;
-  const gvSU = (rv_mean_sat !== null && pa_sat !== null) ? pa_sat - rv_mean_sat : null;
-
-  const atrialEl = document.getElementById('svg_stepup_atrial');
-  const ventEl = document.getElementById('svg_stepup_ventricular');
-  const gvEl = document.getElementById('svg_stepup_gv');
-
-  if (atrialEl) atrialEl.style.display = (atrialSU !== null && atrialSU >= 7) ? 'block' : 'none';
-  if (ventEl) ventEl.style.display = (ventSU !== null && ventSU >= 5) ? 'block' : 'none';
-  if (gvEl) gvEl.style.display = (gvSU !== null && gvSU >= 5) ? 'block' : 'none';
 }
 
 // Initial setup on load
