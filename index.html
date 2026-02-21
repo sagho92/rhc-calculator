@@ -493,6 +493,14 @@
   body.dark .sep-dfp-diagram .dg-tick { stroke: #666; }
   body.dark .sep-dfp-diagram .dg-lbl { fill: #999; }
   body.dark .sep-dfp-diagram .dg-land { stroke: #555; }
+  body.dark .sep-dfp-diagram .dg-ecg { stroke: #ef9a9a; }
+  body.dark .sep-dfp-diagram .dg-ecg-lbl { fill: #ef9a9a; }
+
+  /* Gorlin results headings */
+  .gorlin-heading { font-weight:700; font-size:12px; color:var(--navy); }
+  body.dark .gorlin-heading { color: #8ab4f8; }
+  body.dark #mvaResults > .gorlin-heading { border-top-color: #3a3f4b; }
+  body.dark #ava_math, body.dark #mva_math { color: #8890a0; }
 
 </style>
 </head>
@@ -781,6 +789,75 @@
         <label for="afibToggle">AFib mode — beat-by-beat Gorlin averaging</label>
       </div>
 
+      <details class="sep-dfp-diagram">
+        <summary>SEP &amp; DFP — Pressure Tracing Reference</summary>
+        <div style="margin-top:6px;">
+          <svg viewBox="0 -25 460 320" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:460px;height:auto;font-family:system-ui,sans-serif;">
+            <!-- ECG trace -->
+            <text x="48" y="-8" text-anchor="end" font-size="8" class="dg-ecg-lbl" fill="#e57373" font-weight="600">ECG</text>
+            <path class="dg-ecg" d="M50,-5 L55,-5 C57,-5 58,-11 61,-12 C64,-11 65,-5 67,-5 L69,-5 L70,-2 L73,-22 L76,1 L80,-5 L210,-5 C218,-5 224,-14 233,-14 C242,-14 250,-5 258,-5 L425,-5" fill="none" stroke="#e57373" stroke-width="1.2"/>
+            <!-- Background time-period shading -->
+            <rect x="110" y="30" width="150" height="220" fill="rgba(21,101,192,0.06)"/>
+            <rect x="315" y="30" width="110" height="220" fill="rgba(46,125,50,0.06)"/>
+            <!-- Gradient fill between curves: LV-Ao during SEP -->
+            <path d="M110,133 C130,103 160,68 190,60 C210,67 240,100 260,125 C245,110 215,79 195,74 C165,84 135,111 110,133Z" fill="rgba(21,101,192,0.18)"/>
+            <!-- Gradient fill between curves: PCW-LV during DFP -->
+            <path d="M315,232 C325,234 335,233 350,232 C365,231 385,229 400,227 C410,229 420,231 425,232 L410,236 C390,241 365,244 350,247 C335,248 320,246 315,232Z" fill="rgba(46,125,50,0.18)"/>
+            <!-- Landmark dashed lines -->
+            <line x1="110" y1="250" x2="110" y2="44" class="dg-land" stroke="#bbb" stroke-width="0.5" stroke-dasharray="3,2"/>
+            <line x1="260" y1="250" x2="260" y2="44" class="dg-land" stroke="#bbb" stroke-width="0.5" stroke-dasharray="3,2"/>
+            <line x1="315" y1="250" x2="315" y2="274" class="dg-land" stroke="#bbb" stroke-width="0.5" stroke-dasharray="3,2"/>
+            <line x1="425" y1="250" x2="425" y2="274" class="dg-land" stroke="#bbb" stroke-width="0.5" stroke-dasharray="3,2"/>
+            <!-- Axes -->
+            <line x1="45" y1="250" x2="435" y2="250" class="dg-axis" stroke="#555" stroke-width="1"/>
+            <line x1="45" y1="250" x2="45" y2="30" class="dg-axis" stroke="#555" stroke-width="1"/>
+            <!-- Y-axis ticks and labels -->
+            <line x1="42" y1="250" x2="45" y2="250" class="dg-tick" stroke="#555"/>
+            <text x="39" y="253" text-anchor="end" font-size="9" class="dg-lbl" fill="#666">0</text>
+            <line x1="42" y1="177" x2="45" y2="177" class="dg-tick" stroke="#555"/>
+            <text x="39" y="180" text-anchor="end" font-size="9" class="dg-lbl" fill="#666">50</text>
+            <line x1="42" y1="103" x2="45" y2="103" class="dg-tick" stroke="#555"/>
+            <text x="39" y="106" text-anchor="end" font-size="9" class="dg-lbl" fill="#666">100</text>
+            <line x1="42" y1="30" x2="45" y2="30" class="dg-tick" stroke="#555"/>
+            <text x="39" y="33" text-anchor="end" font-size="9" class="dg-lbl" fill="#666">150</text>
+            <!-- Axis titles -->
+            <text x="14" y="140" text-anchor="middle" font-size="9" class="dg-lbl" fill="#666" transform="rotate(-90,14,140)">Pressure (mmHg)</text>
+            <text x="242" y="273" text-anchor="middle" font-size="9" class="dg-lbl" fill="#666">Time &#x2192;</text>
+            <!-- LV pressure curve (red, solid) -->
+            <path d="M50,238 C55,236 60,234 65,232 C75,192 90,155 110,133 C130,103 160,68 190,60 C210,67 240,100 260,125 C275,162 295,205 315,232 C325,246 335,248 350,247 C365,244 390,241 410,236 L425,232" fill="none" stroke="#c62828" stroke-width="2.2"/>
+            <!-- Aortic pressure curve (blue, solid) -->
+            <path d="M50,130 C70,131 90,133 110,133 C135,111 165,84 195,74 C215,79 245,110 257,124 L262,130 L268,125 C290,129 330,133 370,136 C400,138 415,138 425,138" fill="none" stroke="#1565c0" stroke-width="2.2"/>
+            <!-- PCW/LA pressure curve (green, dashed) -->
+            <path d="M50,235 C53,232 57,229 62,228 C67,228 72,238 80,241 C90,242 105,241 120,240 C150,238 210,232 275,225 C290,224 305,228 315,232 C325,234 335,233 350,232 C365,231 385,229 400,227 C410,229 420,231 425,232" fill="none" stroke="#2e7d32" stroke-width="2" stroke-dasharray="6,3"/>
+            <!-- Curve labels -->
+            <text x="182" y="53" font-size="11" font-weight="700" fill="#c62828">LV</text>
+            <text x="205" y="86" font-size="10" font-weight="700" fill="#1565c0">Ao</text>
+            <text x="140" y="233" font-size="10" font-weight="700" fill="#2e7d32">PCW</text>
+            <!-- PCW wave annotations -->
+            <text x="62" y="221" text-anchor="middle" font-size="8" fill="#2e7d32" font-style="italic">a</text>
+            <text x="275" y="218" text-anchor="middle" font-size="8" fill="#2e7d32" font-style="italic">v</text>
+            <!-- SEP bracket (above curves) -->
+            <line x1="112" y1="40" x2="258" y2="40" stroke="#1565c0" stroke-width="1.5"/>
+            <line x1="112" y1="45" x2="112" y2="35" stroke="#1565c0" stroke-width="1.5"/>
+            <line x1="258" y1="45" x2="258" y2="35" stroke="#1565c0" stroke-width="1.5"/>
+            <text x="185" y="33" text-anchor="middle" font-size="11" font-weight="700" fill="#1565c0">SEP</text>
+            <!-- DFP bracket (below x-axis) -->
+            <line x1="317" y1="278" x2="423" y2="278" stroke="#2e7d32" stroke-width="1.5"/>
+            <line x1="317" y1="274" x2="317" y2="282" stroke="#2e7d32" stroke-width="1.5"/>
+            <line x1="423" y1="274" x2="423" y2="282" stroke="#2e7d32" stroke-width="1.5"/>
+            <text x="370" y="293" text-anchor="middle" font-size="11" font-weight="700" fill="#2e7d32">DFP</text>
+            <!-- Gradient (ΔP) labels -->
+            <text x="185" y="100" text-anchor="middle" font-size="9" fill="rgba(21,101,192,0.8)" font-style="italic">&#x394;P (LV&#x2013;Ao)</text>
+            <text x="370" y="242" text-anchor="middle" font-size="8" fill="rgba(46,125,50,0.9)" font-style="italic">&#x394;P (PCW&#x2013;LV)</text>
+            <!-- Landmark labels below axis (two-line with physiologic context) -->
+            <text x="110" y="259" text-anchor="middle" class="dg-lbl" fill="#999"><tspan x="110" font-size="6.5">AV open</tspan><tspan x="110" dy="8" font-size="5.5" font-style="italic">(LV &gt; Ao)</tspan></text>
+            <text x="260" y="259" text-anchor="middle" class="dg-lbl" fill="#999"><tspan x="260" font-size="6.5">AV close</tspan><tspan x="260" dy="8" font-size="5.5" font-style="italic">(dicrotic notch)</tspan></text>
+            <text x="315" y="259" text-anchor="middle" class="dg-lbl" fill="#999"><tspan x="315" font-size="6.5">MV open</tspan><tspan x="315" dy="8" font-size="5.5" font-style="italic">(LV &lt; PCW)</tspan></text>
+            <text x="425" y="259" text-anchor="middle" class="dg-lbl" fill="#999"><tspan x="425" font-size="6.5">MV close</tspan><tspan x="425" dy="8" font-size="5.5" font-style="italic">(onset systole)</tspan></text>
+          </svg>
+        </div>
+      </details>
+
       <!-- SINGLE-VALUE INPUTS (non-AFib) -->
       <div id="avaSingleInputs">
         <div class="subsection">Aortic Valve (AVA)</div>
@@ -819,74 +896,6 @@
         </div>
         <div class="hint">DFP = filling time/beat × HR. Typical: 0.40–0.50 sec/beat → 30–40 sec/min. Shortened in tachycardia. Average ≥5 beats in AFib.</div>
       </div>
-
-      <details class="sep-dfp-diagram">
-        <summary>SEP &amp; DFP — Pressure Tracing Reference</summary>
-        <div style="margin-top:6px;">
-          <svg viewBox="0 0 460 290" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:460px;height:auto;font-family:system-ui,sans-serif;">
-            <!-- Background time-period shading -->
-            <rect x="110" y="30" width="150" height="220" fill="rgba(21,101,192,0.06)"/>
-            <rect x="300" y="30" width="125" height="220" fill="rgba(46,125,50,0.06)"/>
-            <!-- Gradient fill between curves: LV-Ao during SEP -->
-            <path d="M110,133 C130,103 160,68 190,60 C210,67 240,100 260,125 C245,110 215,79 195,74 C165,84 135,111 110,133Z" fill="rgba(21,101,192,0.18)"/>
-            <!-- Gradient fill between curves: PCW-LV during DFP -->
-            <path d="M300,232 C312,234 325,233 345,232 C365,231 385,229 400,227 C410,229 420,231 425,232 L410,236 C390,241 365,244 345,247 C325,248 310,246 300,232Z" fill="rgba(46,125,50,0.18)"/>
-            <!-- Landmark dashed lines -->
-            <line x1="110" y1="250" x2="110" y2="44" class="dg-land" stroke="#bbb" stroke-width="0.5" stroke-dasharray="3,2"/>
-            <line x1="260" y1="250" x2="260" y2="44" class="dg-land" stroke="#bbb" stroke-width="0.5" stroke-dasharray="3,2"/>
-            <line x1="300" y1="250" x2="300" y2="264" class="dg-land" stroke="#bbb" stroke-width="0.5" stroke-dasharray="3,2"/>
-            <line x1="425" y1="250" x2="425" y2="264" class="dg-land" stroke="#bbb" stroke-width="0.5" stroke-dasharray="3,2"/>
-            <!-- Axes -->
-            <line x1="45" y1="250" x2="435" y2="250" class="dg-axis" stroke="#555" stroke-width="1"/>
-            <line x1="45" y1="250" x2="45" y2="30" class="dg-axis" stroke="#555" stroke-width="1"/>
-            <!-- Y-axis ticks and labels (0, 50, 100, 150 mmHg) -->
-            <line x1="42" y1="250" x2="45" y2="250" class="dg-tick" stroke="#555"/>
-            <text x="39" y="253" text-anchor="end" font-size="9" class="dg-lbl" fill="#666">0</text>
-            <line x1="42" y1="177" x2="45" y2="177" class="dg-tick" stroke="#555"/>
-            <text x="39" y="180" text-anchor="end" font-size="9" class="dg-lbl" fill="#666">50</text>
-            <line x1="42" y1="103" x2="45" y2="103" class="dg-tick" stroke="#555"/>
-            <text x="39" y="106" text-anchor="end" font-size="9" class="dg-lbl" fill="#666">100</text>
-            <line x1="42" y1="30" x2="45" y2="30" class="dg-tick" stroke="#555"/>
-            <text x="39" y="33" text-anchor="end" font-size="9" class="dg-lbl" fill="#666">150</text>
-            <!-- Axis titles -->
-            <text x="14" y="140" text-anchor="middle" font-size="9" class="dg-lbl" fill="#666" transform="rotate(-90,14,140)">Pressure (mmHg)</text>
-            <text x="242" y="263" text-anchor="middle" font-size="9" class="dg-lbl" fill="#666">Time &#x2192;</text>
-            <!-- LV pressure curve (red, solid) -->
-            <path d="M50,238 C55,236 60,234 65,232 C75,192 90,155 110,133 C130,103 160,68 190,60 C210,67 240,100 260,125 C272,162 285,205 300,232 C310,246 325,248 345,247 C365,244 390,241 410,236 L425,232" fill="none" stroke="#c62828" stroke-width="2.2"/>
-            <!-- Aortic pressure curve (blue, solid) -->
-            <path d="M50,130 C70,131 90,133 110,133 C135,111 165,84 195,74 C215,79 245,110 257,124 L262,130 L268,125 C290,129 330,133 370,136 C400,138 415,138 425,138" fill="none" stroke="#1565c0" stroke-width="2.2"/>
-            <!-- PCW/LA pressure curve (green, dashed) -->
-            <path d="M50,235 C53,232 57,229 62,228 C67,228 72,238 80,241 C90,242 105,241 120,240 C150,238 200,232 255,225 C270,224 285,228 300,232 C312,234 325,233 345,232 C365,231 385,229 400,227 C410,229 420,231 425,232" fill="none" stroke="#2e7d32" stroke-width="2" stroke-dasharray="6,3"/>
-            <!-- Curve labels -->
-            <text x="182" y="53" font-size="11" font-weight="700" fill="#c62828">LV</text>
-            <text x="205" y="86" font-size="10" font-weight="700" fill="#1565c0">Ao</text>
-            <text x="140" y="233" font-size="10" font-weight="700" fill="#2e7d32">PCW</text>
-            <!-- PCW wave annotations -->
-            <text x="62" y="221" text-anchor="middle" font-size="8" fill="#2e7d32" font-style="italic">a</text>
-            <text x="255" y="218" text-anchor="middle" font-size="8" fill="#2e7d32" font-style="italic">v</text>
-            <!-- Dicrotic notch annotation -->
-            <text x="276" y="120" font-size="7" class="dg-lbl" fill="#888" font-style="italic">dicrotic notch</text>
-            <!-- SEP bracket (above curves) -->
-            <line x1="112" y1="40" x2="258" y2="40" stroke="#1565c0" stroke-width="1.5"/>
-            <line x1="112" y1="45" x2="112" y2="35" stroke="#1565c0" stroke-width="1.5"/>
-            <line x1="258" y1="45" x2="258" y2="35" stroke="#1565c0" stroke-width="1.5"/>
-            <text x="185" y="33" text-anchor="middle" font-size="11" font-weight="700" fill="#1565c0">SEP</text>
-            <!-- DFP bracket (below x-axis) -->
-            <line x1="302" y1="268" x2="423" y2="268" stroke="#2e7d32" stroke-width="1.5"/>
-            <line x1="302" y1="264" x2="302" y2="272" stroke="#2e7d32" stroke-width="1.5"/>
-            <line x1="423" y1="264" x2="423" y2="272" stroke="#2e7d32" stroke-width="1.5"/>
-            <text x="362" y="282" text-anchor="middle" font-size="11" font-weight="700" fill="#2e7d32">DFP</text>
-            <!-- Gradient (ΔP) labels -->
-            <text x="185" y="100" text-anchor="middle" font-size="9" fill="rgba(21,101,192,0.8)" font-style="italic">&#x394;P</text>
-            <text x="375" y="240" text-anchor="middle" font-size="9" fill="rgba(46,125,50,0.9)" font-style="italic">&#x394;P</text>
-            <!-- Landmark labels below axis -->
-            <text x="110" y="260" text-anchor="middle" font-size="6.5" class="dg-lbl" fill="#999">AV open</text>
-            <text x="260" y="260" text-anchor="middle" font-size="6.5" class="dg-lbl" fill="#999">AV close</text>
-            <text x="300" y="260" text-anchor="middle" font-size="6.5" class="dg-lbl" fill="#999">MV open</text>
-            <text x="425" y="260" text-anchor="middle" font-size="6.5" class="dg-lbl" fill="#999">MV close</text>
-          </svg>
-        </div>
-      </details>
 
       <!-- AFIB PER-BEAT INPUTS (hidden by default) -->
       <div id="avaAfibInputs" style="display:none;">
@@ -1226,7 +1235,7 @@
     <div class="section-body">
 
       <div id="avaResults" style="display:none;">
-        <div style="font-weight:700; font-size:12px; color:var(--navy); margin-bottom:2px;">Aortic Valve Area (AVA)</div>
+        <div class="gorlin-heading" style="margin-bottom:2px;">Aortic Valve Area (AVA)</div>
         <div class="result-row">
           <span class="result-label">AVA</span>
           <span class="result-value" id="r_ava">—</span>
@@ -1247,7 +1256,7 @@
       </div>
 
       <div id="mvaResults" style="display:none;">
-        <div style="font-weight:700; font-size:12px; color:var(--navy); margin:6px 0 2px 0; border-top:1px solid #eee; padding-top:6px;">Mitral Valve Area (MVA)</div>
+        <div class="gorlin-heading" style="margin:6px 0 2px 0; border-top:1px solid #eee; padding-top:6px;">Mitral Valve Area (MVA)</div>
         <div class="result-row">
           <span class="result-label">MVA</span>
           <span class="result-value" id="r_mva">—</span>
@@ -2767,6 +2776,14 @@ function loadExample() {
   document.getElementById('pvo2_source').value = 'assume_sa';
   handlePvO2Source();
   document.getElementById('fio2').value = '21';
+
+  // Gorlin valve area example (low-flow low-gradient severe AS, severe MS)
+  document.getElementById('ava_gradient').value = '25';
+  document.getElementById('ava_ejtime').value = '0.32';
+  calcSEP();
+  document.getElementById('mva_gradient').value = '10';
+  document.getElementById('mva_filltime').value = '0.45';
+  calcDFP();
 
   calc();
 }
